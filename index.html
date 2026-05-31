@@ -132,9 +132,18 @@
       <p class="sl mb-0">Medição por Obra (Faturamento)</p>
       <button onclick="loadMedicao()" class="text-xs text-g-blue font-medium hover:underline">↻ Atualizar</button>
     </div>
-    <div class="flex gap-2 mb-4">
+    <div class="flex gap-2 mb-3 flex-wrap">
       <select id="medObra" onchange="renderMedicao()" class="f h-9 text-xs w-auto min-w-[140px]"><option value="">Todas obras</option></select>
       <select id="medCiclo" onchange="renderMedicao()" class="f h-9 text-xs w-auto min-w-[120px]"><option value="">Todos ciclos</option></select>
+    </div>
+    <div class="bg-white rounded-lg shadow-md1 p-3 mb-4">
+      <p class="fl mb-2">Período de conclusão (para fechar medição)</p>
+      <div class="flex gap-2 items-center">
+        <input type="date" id="medDe" onchange="renderMedicao()" class="f h-9 text-xs flex-1">
+        <span class="text-xs text-g-hint">até</span>
+        <input type="date" id="medAte" onchange="renderMedicao()" class="f h-9 text-xs flex-1">
+        <button onclick="limparPeriodo()" class="text-xs text-g-blue font-medium hover:underline whitespace-nowrap px-2">Limpar</button>
+      </div>
     </div>
     <div id="medTotal" class="bg-g-blueBg rounded-lg p-4 mb-4 hidden">
       <p class="text-xs text-g-secondary">Total Executado (filtro atual)</p>
@@ -346,7 +355,9 @@
     }
 
     // ===== SAVE =====
+    let salvando=false;
     async function salvarFrente(){
+      if(salvando)return; // proteção contra duplo envio
       document.querySelectorAll('.error').forEach(e=>e.classList.remove('error'));
       if(!document.getElementById('resp').value.trim()){toast('Preencha "Preenchido por"','error');return;}
       let ok=true,first=null;
@@ -366,7 +377,7 @@
       if(tipoAtual==='medido'&&!hasTit){toast('Defina um profissional como Titular','error');return;}
       if(!ok){if(first)first.scrollIntoView({behavior:'smooth',block:'center'});return;}
 
-      const btn=document.getElementById('btnSalvar');btn.classList.add('bl');btn.disabled=true;
+      const btn=document.getElementById('btnSalvar');salvando=true;btn.classList.add('bl');btn.disabled=true;
       try{
         const svcVal=needSvc?document.getElementById('svc').value:({diaria:'Diária (Sábado/Domingo/Feriado)'}[tipoAtual]||tipoAtual);
         const {data:atv,error:e1}=await db.from('atividades').insert({
@@ -389,7 +400,7 @@
         document.getElementById('amb').value='';document.getElementById('obs').value='';document.getElementById('svc').value='';
         document.getElementById('teamList').innerHTML='';memberC=0;addMember();
       }catch(e){toast('Erro ao salvar: '+(e.message||e),'error');console.error(e);}
-      finally{btn.classList.remove('bl');btn.disabled=false;}
+      finally{salvando=false;btn.classList.remove('bl');btn.disabled=false;}
     }
 
     // ===== EM ANDAMENTO =====
@@ -438,10 +449,21 @@
     }
 
     // ===== CONCLUIR =====
-    function abrirConcluir(id,svc){concluirId=id;document.getElementById('modalInfo').textContent=svc;document.getElementById('dtFim').value=new Date().toISOString().split('T')[0];document.getElementById('modalConcluir').classList.remove('hidden');document.getElementById('modalConcluir').classList.add('flex');}
+    let concluirDataIni=null;
+    function abrirConcluir(id,svc){
+      concluirId=id;
+      const atv=andData.find(a=>a.id===id);
+      concluirDataIni=atv?atv.data_inicio:null;
+      document.getElementById('modalInfo').textContent=svc+(concluirDataIni?' · Início: '+fmtD(concluirDataIni):'');
+      const dtFim=document.getElementById('dtFim');
+      dtFim.value=new Date().toISOString().split('T')[0];
+      if(concluirDataIni)dtFim.min=String(concluirDataIni).split('T')[0];
+      document.getElementById('modalConcluir').classList.remove('hidden');document.getElementById('modalConcluir').classList.add('flex');
+    }
     function fecharModal(){document.getElementById('modalConcluir').classList.add('hidden');document.getElementById('modalConcluir').classList.remove('flex');concluirId=null;}
     async function confirmarConclusao(){
       const dt=document.getElementById('dtFim').value;if(!dt){toast('Informe a data de conclusão','error');return;}
+      if(concluirDataIni&&dt<String(concluirDataIni).split('T')[0]){toast('A conclusão não pode ser anterior ao início ('+fmtD(concluirDataIni)+')','error');return;}
       const btn=document.getElementById('btnConcluir');btn.classList.add('bl');btn.disabled=true;
       try{const {error}=await db.from('atividades').update({data_fim:dt}).eq('id',concluirId);if(error)throw error;toast('Frente concluída!','success');fecharModal();loadAndamento();}
       catch(e){toast('Erro ao concluir: '+(e.message||e),'error');console.error(e);}
@@ -474,20 +496,33 @@
       }catch(e){console.error(e);medData=[];}
       document.getElementById('medLoad').classList.add('hidden');renderMedicao();
     }
+    function limparPeriodo(){document.getElementById('medDe').value='';document.getElementById('medAte').value='';renderMedicao();}
     function renderMedicao(){
       const list=document.getElementById('medList');list.innerHTML='';
       const fo=document.getElementById('medObra').value,fc=document.getElementById('medCiclo').value;
-      let d=medData;if(fo)d=d.filter(m=>m.obra===fo);if(fc)d=d.filter(m=>m.ciclo===fc);
-      if(!d.length){document.getElementById('medEmpty').classList.remove('hidden');return;}
+      const de=document.getElementById('medDe').value,ate=document.getElementById('medAte').value;
+      let d=medData;
+      if(fo)d=d.filter(m=>m.obra===fo);
+      if(fc)d=d.filter(m=>m.ciclo===fc);
+      // Filtro por período de conclusão (data_fim)
+      if(de)d=d.filter(m=>m.data_fim&&String(m.data_fim).split('T')[0]>=de);
+      if(ate)d=d.filter(m=>m.data_fim&&String(m.data_fim).split('T')[0]<=ate);
+      if(!d.length){document.getElementById('medEmpty').classList.remove('hidden');document.getElementById('medTotal').classList.add('hidden');return;}
       document.getElementById('medEmpty').classList.add('hidden');
-      const totM2=d.reduce((s,m)=>s+Number(m.m2_executado||0),0);
-      const totFr=d.reduce((s,m)=>s+Number(m.qtd_frentes||0),0);
+      // Re-agregar por obra+serviço (a view vem por data_fim, somamos no período filtrado)
+      const agg={};
+      d.forEach(m=>{const k=m.obra+'||'+m.servico;if(!agg[k])agg[k]={obra:m.obra,servico:m.servico,m2:0,frentes:0,ciclos:new Set()};agg[k].m2+=Number(m.m2_executado||0);agg[k].frentes+=Number(m.qtd_frentes||0);if(m.ciclo)agg[k].ciclos.add(m.ciclo);});
+      const aggList=Object.values(agg).sort((a,b)=>b.m2-a.m2);
+      const totM2=aggList.reduce((s,m)=>s+m.m2,0);
+      const totFr=aggList.reduce((s,m)=>s+m.frentes,0);
       document.getElementById('medTotal').classList.remove('hidden');
       document.getElementById('medTotalM2').textContent=fmtM2(totM2);
-      document.getElementById('medTotalFrentes').textContent=totFr+' frente(s)';
-      d.sort((a,b)=>(b.ciclo||'').localeCompare(a.ciclo||'')).forEach((m,i)=>{
+      const periodoTxt=(de||ate)?' · período '+(de?fmtD(de):'…')+' a '+(ate?fmtD(ate):'…'):'';
+      document.getElementById('medTotalFrentes').textContent=totFr+' frente(s)'+periodoTxt;
+      aggList.forEach((m,i)=>{
+        const ciclosTxt=[...m.ciclos].sort().join(', ');
         const card=document.createElement('div');card.className='bg-white rounded-lg shadow-md1 p-4 su';card.style.animationDelay=(i*.02)+'s';
-        card.innerHTML='<div class="flex items-start justify-between gap-3"><div class="min-w-0 flex-1"><p class="text-sm font-bold text-g-text">'+esc(m.obra)+'</p><p class="text-xs text-g-secondary mt-0.5">'+esc(m.servico)+'</p><p class="text-xs text-g-hint mt-1">Ciclo '+esc(m.ciclo)+' · '+m.qtd_frentes+' frente(s)</p></div><div class="text-right flex-shrink-0"><p class="text-base font-bold text-g-blue">'+fmtM2(m.m2_executado)+'</p><p class="text-xs text-g-hint">executado</p></div></div>';
+        card.innerHTML='<div class="flex items-start justify-between gap-3"><div class="min-w-0 flex-1"><p class="text-sm font-bold text-g-text">'+esc(m.obra)+'</p><p class="text-xs text-g-secondary mt-0.5">'+esc(m.servico)+'</p><p class="text-xs text-g-hint mt-1">Ciclo(s) '+esc(ciclosTxt)+' · '+m.frentes+' frente(s)</p></div><div class="text-right flex-shrink-0"><p class="text-base font-bold text-g-blue">'+fmtM2(m.m2)+'</p><p class="text-xs text-g-hint">a medir</p></div></div>';
         list.appendChild(card);
       });
     }
