@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#ffffff">
+  <title>OS Produção — Bronx</title>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config={theme:{extend:{
+      fontFamily:{sans:['Google Sans','Roboto','sans-serif']},
+      colors:{g:{bg:'#f8f9fa',surface:'#fff',border:'#dadce0',divider:'#e8eaed',text:'#202124',secondary:'#5f6368',hint:'#80868b',blue:'#1a73e8',blueHover:'#1557b0',blueBg:'#e8f0fe',green:'#137333',greenBg:'#e6f4ea',red:'#c5221f',redBg:'#fce8e6',amber:'#b06000',amberBg:'#fef7e0'}},
+      boxShadow:{'md1':'0 1px 2px 0 rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15)','md2':'0 1px 3px 0 rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.15)'}
+    }}}
+  </script>
+  <style>
+    *{-webkit-tap-highlight-color:transparent}body{overscroll-behavior:none}select,input,textarea{font-size:16px!important}
+    .f{width:100%;height:48px;padding:0 12px;background:#fff;border:1px solid #dadce0;border-radius:8px;font-size:14px;color:#202124;outline:none;transition:border .15s,box-shadow .15s}
+    .f:focus{border-color:#1a73e8;box-shadow:0 0 0 2px #e8f0fe}.f.error{border-color:#c5221f;box-shadow:0 0 0 2px #fce8e6}.f::placeholder{color:#80868b}
+    textarea.f{height:auto;padding:12px;resize:none}
+    select.f{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235f6368' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+    .fg{transition:opacity .2s}.fg.disabled{opacity:.35;pointer-events:none}
+    .sl{font-size:11px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;color:#5f6368;margin-bottom:12px}
+    .fl{display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:6px}
+    .su{animation:su .3s ease both}@keyframes su{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .toast{animation:ti .25s ease,to .25s ease 3.2s forwards}@keyframes ti{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}@keyframes to{from{opacity:1}to{opacity:0;transform:translateY(-20px)}}
+    .bl{position:relative;color:transparent!important}.bl::after{content:'';position:absolute;width:20px;height:20px;top:50%;left:50%;margin:-10px 0 0 -10px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+    .tab{padding:10px 14px;font-size:13px;font-weight:500;border-bottom:2px solid transparent;color:#5f6368;cursor:pointer;white-space:nowrap;transition:all .15s}
+    .tab.active{border-bottom-color:#1a73e8;color:#1a73e8}
+    .tabs-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}.tabs-scroll::-webkit-scrollbar{display:none}
+    .card{transition:all .15s}.card:hover{box-shadow:0 1px 3px 0 rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.15)}
+  </style>
+</head>
+<body class="bg-g-bg font-sans min-h-screen">
+
+  <header class="bg-white sticky top-0 z-50 border-b border-g-border">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="#" onclick="go('novo');return false" class="flex items-center gap-3">
+        <img src="https://i.ibb.co/hx1fxsqp/Outlook-sw1reuxp.png" alt="Bronx" class="h-6" onerror="this.style.display='none'">
+        <div class="h-5 w-px bg-g-border hidden sm:block"></div>
+        <span class="text-sm font-medium text-g-secondary hidden sm:block">OS Produção</span>
+      </a>
+      <div class="flex items-center gap-2" id="connStatus">
+        <div class="w-2 h-2 rounded-full bg-g-hint"></div>
+        <span class="text-xs font-medium text-g-hint">Conectando...</span>
+      </div>
+    </div>
+    <div class="max-w-3xl mx-auto px-2 tabs-scroll"><div class="flex">
+      <button onclick="go('novo')" id="tab-novo" class="tab active">+ Novo</button>
+      <button onclick="go('andamento')" id="tab-andamento" class="tab">Em Andamento <span id="cntAnd" class="text-xs bg-g-bg px-1.5 rounded-full ml-1">0</span></button>
+      <button onclick="go('concluidas')" id="tab-concluidas" class="tab">Concluídas</button>
+      <button onclick="go('medicao')" id="tab-medicao" class="tab">Medição</button>
+      <button onclick="go('producao')" id="tab-producao" class="tab">Produção</button>
+    </div></div>
+  </header>
+
+  <!-- ===== NOVO LANÇAMENTO ===== -->
+  <main id="vNovo" class="max-w-3xl mx-auto px-4 py-5">
+    <div class="bg-white rounded-lg shadow-md1 p-4 flex items-center gap-3 mb-4 su">
+      <span class="fl mb-0 whitespace-nowrap">Preenchido por <span class="text-g-red">*</span></span>
+      <input type="text" id="resp" required placeholder="Seu nome" class="f h-10" oninput="localStorage.setItem('bronx_os_resp',this.value)">
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md1 p-5 space-y-4 su">
+      <p class="sl mb-2">Frente de Trabalho</p>
+      <div class="fg" id="fgO"><label class="fl">Obra <span class="text-g-red">*</span></label><select id="obra" class="f"><option value="">Selecione a obra</option></select></div>
+      <div class="fg disabled" id="fgP"><label class="fl">Pavimento <span class="text-g-red">*</span></label><select id="pav" class="f"><option value="">Selecione o pavimento</option></select></div>
+      <div><label class="fl">Ambiente <span class="text-g-red">*</span></label><input type="text" id="amb" placeholder="Ex: Banheiros, Laje, Jardins" class="f"></div>
+      <div><label class="fl">Serviço <span class="text-g-red">*</span></label><select id="svc" class="f"><option value="">Selecione o serviço</option></select></div>
+      <div><label class="fl">Data de Início <span class="text-g-red">*</span></label><input type="date" id="dtIni" class="f"></div>
+    </div>
+
+    <div class="mt-4 su">
+      <div class="flex items-center justify-between mb-3">
+        <p class="sl mb-0">Equipe</p>
+        <span id="teamCnt" class="text-xs text-g-hint font-medium">0 profissionais</span>
+      </div>
+      <div class="bg-white rounded-lg shadow-md1 p-4 space-y-3">
+        <div id="teamList" class="space-y-3"></div>
+        <button onclick="addMember()" class="w-full h-11 border-2 border-dashed border-g-border rounded-lg text-sm font-medium text-g-blue hover:bg-g-blueBg transition-colors flex items-center justify-center gap-2">+ Adicionar Profissional</button>
+      </div>
+    </div>
+
+    <div class="mt-4 su">
+      <label class="fl">Observações</label>
+      <textarea id="obs" rows="2" placeholder="Intercorrências, anotações..." class="f"></textarea>
+    </div>
+
+    <button onclick="salvarFrente()" id="btnSalvar" class="w-full h-12 bg-g-blue hover:bg-g-blueHover text-white font-medium text-sm rounded-lg shadow-md1 transition-all active:scale-[0.98] mt-5 mb-8 su">Criar Frente</button>
+  </main>
+
+  <!-- ===== EM ANDAMENTO ===== -->
+  <main id="vAndamento" class="max-w-3xl mx-auto px-4 py-5 hidden">
+    <div class="flex items-center justify-between mb-4">
+      <p class="sl mb-0">Frentes em Andamento</p>
+      <label class="flex items-center gap-2 text-xs text-g-secondary"><input type="checkbox" id="filtroMeus" onchange="renderAndamento()"> Só meus lançamentos</label>
+    </div>
+    <div id="andList" class="space-y-3"></div>
+    <div id="andLoad" class="text-center py-8 text-sm text-g-hint">Carregando...</div>
+    <div id="andEmpty" class="text-center py-8 text-sm text-g-hint hidden">Nenhuma frente em andamento</div>
+  </main>
+
+  <!-- ===== CONCLUÍDAS ===== -->
+  <main id="vConcluidas" class="max-w-3xl mx-auto px-4 py-5 hidden">
+    <p class="sl">Frentes Concluídas</p>
+    <div id="concList" class="space-y-3"></div>
+    <div id="concLoad" class="text-center py-8 text-sm text-g-hint">Carregando...</div>
+    <div id="concEmpty" class="text-center py-8 text-sm text-g-hint hidden">Nenhuma frente concluída</div>
+  </main>
+
+  <!-- ===== MEDIÇÃO ===== -->
+  <main id="vMedicao" class="max-w-3xl mx-auto px-4 py-5 hidden">
+    <div class="flex items-center justify-between mb-3">
+      <p class="sl mb-0">Medição por Obra (Faturamento)</p>
+      <button onclick="loadMedicao()" class="text-xs text-g-blue font-medium hover:underline">↻ Atualizar</button>
+    </div>
+    <div class="flex gap-2 mb-4">
+      <select id="medObra" onchange="renderMedicao()" class="f h-9 text-xs w-auto min-w-[140px]"><option value="">Todas obras</option></select>
+      <select id="medCiclo" onchange="renderMedicao()" class="f h-9 text-xs w-auto min-w-[120px]"><option value="">Todos ciclos</option></select>
+    </div>
+    <div id="medTotal" class="bg-g-blueBg rounded-lg p-4 mb-4 hidden">
+      <p class="text-xs text-g-secondary">Total a Faturar (filtro atual)</p>
+      <p class="text-2xl font-bold text-g-blue" id="medTotalVal">R$ 0,00</p>
+      <p class="text-xs text-g-secondary" id="medTotalM2">0 m²</p>
+    </div>
+    <div id="medList" class="space-y-3"></div>
+    <div id="medLoad" class="text-center py-8 text-sm text-g-hint">Carregando...</div>
+    <div id="medEmpty" class="text-center py-8 text-sm text-g-hint hidden">Nenhuma medição registrada</div>
+  </main>
+
+  <!-- ===== PRODUÇÃO ===== -->
+  <main id="vProducao" class="max-w-3xl mx-auto px-4 py-5 hidden">
+    <div class="flex items-center justify-between mb-3">
+      <p class="sl mb-0">Produção MO (Pagamento Equipe)</p>
+      <button onclick="loadProducao()" class="text-xs text-g-blue font-medium hover:underline">↻ Atualizar</button>
+    </div>
+    <div class="flex gap-2 mb-4">
+      <select id="prodMes" onchange="renderProducao()" class="f h-9 text-xs w-auto min-w-[120px]"><option value="">Todos meses</option></select>
+      <select id="prodProf" onchange="renderProducao()" class="f h-9 text-xs w-auto min-w-[140px]"><option value="">Todos profissionais</option></select>
+    </div>
+    <div id="prodTotal" class="bg-g-greenBg rounded-lg p-4 mb-4 hidden">
+      <p class="text-xs text-g-secondary">Total de Produção a Pagar (filtro atual)</p>
+      <p class="text-2xl font-bold text-g-green" id="prodTotalVal">R$ 0,00</p>
+    </div>
+    <div id="prodList" class="space-y-3"></div>
+    <div id="prodLoad" class="text-center py-8 text-sm text-g-hint">Carregando...</div>
+    <div id="prodEmpty" class="text-center py-8 text-sm text-g-hint hidden">Nenhuma produção registrada</div>
+  </main>
+
+  <!-- ===== CONCLUIR MODAL ===== -->
+  <div id="modalConcluir" class="fixed inset-0 bg-black/40 z-[90] hidden items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-md2 p-6 max-w-sm w-full">
+      <h3 class="text-lg font-bold text-g-text mb-1">Concluir Frente</h3>
+      <p class="text-sm text-g-secondary mb-4" id="modalInfo"></p>
+      <label class="fl">Data de Conclusão <span class="text-g-red">*</span></label>
+      <input type="date" id="dtFim" class="f mb-4">
+      <div class="flex gap-2">
+        <button onclick="fecharModal()" class="flex-1 h-11 border border-g-border rounded-lg text-sm font-medium text-g-secondary">Cancelar</button>
+        <button onclick="confirmarConclusao()" id="btnConcluir" class="flex-1 h-11 bg-g-green text-white rounded-lg text-sm font-medium">Concluir</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastC" class="fixed bottom-6 left-4 right-4 z-[100] flex flex-col items-center pointer-events-none"></div>
+
+  <script>
+    const SB_URL="https://vjykaegxqbpupkcvlnpo.supabase.co";
+    const SB_KEY="sb_publishable_bkvDYXXBk_OA9dWBSnK6lw_0DeOou9N";
+    const db=supabase.createClient(SB_URL,SB_KEY);
+    let REF=null,memberC=0,concluirId=null,medData=[],prodData=[];
+    const VIEWS={novo:'vNovo',andamento:'vAndamento',concluidas:'vConcluidas',medicao:'vMedicao',producao:'vProducao'};
+
+    function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+    function toast(m,t){const c=document.getElementById('toastC'),d=document.createElement('div');d.className='toast '+(t==='success'?'bg-g-green':'bg-g-red')+' text-white px-5 py-3 rounded-lg shadow-md2 flex items-center gap-3 text-sm font-medium pointer-events-auto mb-2 max-w-md';d.innerHTML='<span class="flex-shrink-0 w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">'+(t==='success'?'✓':'✕')+'</span><span>'+esc(m)+'</span>';c.appendChild(d);setTimeout(()=>d.remove(),3700);}
+    function fmtBR(n){return 'R$ '+Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+    function fmtM2(n){return Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' m²';}
+    function fmtD(d){if(!d)return'-';d=String(d).split('T')[0];const p=d.split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:d;}
+
+    function go(tab){
+      Object.entries(VIEWS).forEach(([k,v])=>document.getElementById(v).classList.toggle('hidden',k!==tab));
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.getElementById('tab-'+tab).classList.add('active');
+      window.scrollTo({top:0,behavior:'smooth'});
+      if(tab==='andamento')loadAndamento();
+      if(tab==='concluidas')loadConcluidas();
+      if(tab==='medicao')loadMedicao();
+      if(tab==='producao')loadProducao();
+    }
+
+    // ===== INIT =====
+    document.addEventListener('DOMContentLoaded',async function(){
+      const s=localStorage.getItem('bronx_os_resp');if(s)document.getElementById('resp').value=s;
+      document.getElementById('dtIni').value=new Date().toISOString().split('T')[0];
+      try{
+        const r=await fetch('ref_os.json');REF=await r.json();
+        ['obra'].forEach(id=>{const sel=document.getElementById(id);REF.obras.forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;sel.appendChild(op);});});
+        const svcSel=document.getElementById('svc');REF.servicos.forEach(sv=>{const op=document.createElement('option');op.value=sv;op.textContent=sv;svcSel.appendChild(op);});
+        const fixed=document.createElement('option');fixed.value='Sábado/Domingo/Feriado';fixed.textContent='Sábado/Domingo/Feriado';svcSel.insertBefore(fixed,svcSel.children[1]);
+      }catch(e){toast('Erro ao carregar dados de referência','error');console.error(e);}
+      // Test connection
+      try{
+        const {error}=await db.from('atividades').select('id',{count:'exact',head:true});
+        if(error)throw error;
+        document.getElementById('connStatus').innerHTML='<div class="w-2 h-2 rounded-full bg-g-green"></div><span class="text-xs font-medium text-g-green">Online</span>';
+        loadAndamento();
+      }catch(e){
+        document.getElementById('connStatus').innerHTML='<div class="w-2 h-2 rounded-full bg-g-red"></div><span class="text-xs font-medium text-g-red">Offline</span>';
+        console.error('Conn error:',e);
+      }
+      addMember();
+    });
+
+    // ===== CASCADE =====
+    document.getElementById('obra').addEventListener('change',function(){
+      const sp=document.getElementById('pav');sp.innerHTML='<option value="">Selecione o pavimento</option>';
+      if(!this.value){document.getElementById('fgP').classList.add('disabled');return;}
+      document.getElementById('fgP').classList.remove('disabled');
+      (REF.pavimentos[this.value]||[]).forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;sp.appendChild(o);});
+    });
+
+    document.getElementById('svc').addEventListener('change',function(){
+      const isSDF=this.value==='Sábado/Domingo/Feriado';
+      document.querySelectorAll('[id^="area-"]').forEach(el=>{if(isSDF){el.value='0';el.readOnly=true;el.classList.add('bg-g-bg');}else{el.readOnly=false;el.classList.remove('bg-g-bg');if(el.value==='0')el.value='';}});
+    });
+
+    // ===== TEAM =====
+    function addMember(){
+      memberC++;const id=memberC;
+      const list=document.getElementById('teamList');
+      const card=document.createElement('div');card.className='bg-g-bg rounded-lg p-3 space-y-2 border border-g-border su';card.id='m-'+id;
+      card.innerHTML=
+        '<div class="flex items-center justify-between"><span class="text-xs font-medium text-g-secondary uppercase">Profissional '+(teamCount()+1)+'</span>'+
+        '<div class="flex items-center gap-2"><button type="button" onclick="setTit('+id+')" id="tit-'+id+'" class="text-xs font-medium px-3 py-1 rounded-full border border-g-border text-g-hint">Titular</button>'+
+        '<button type="button" onclick="rmMember('+id+')" class="text-g-hint hover:text-g-red text-lg leading-none px-1">✕</button></div></div>'+
+        '<select id="col-'+id+'" class="f h-10"><option value="">Selecione</option></select>'+
+        '<div class="grid grid-cols-3 gap-2">'+
+        '<select id="fun-'+id+'" class="f h-10 col-span-1"><option value="Profissional">Prof.</option><option value="Ajudante">Ajud.</option></select>'+
+        '<div class="relative col-span-1"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-g-hint text-xs">m²</span><input type="text" id="area-'+id+'" inputmode="decimal" placeholder="0,00" class="f h-10 pl-7"></div>'+
+        '<div class="relative col-span-1"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-g-hint text-xs">R$</span><input type="text" id="prc-'+id+'" inputmode="decimal" placeholder="0,00" class="f h-10 pl-7"></div>'+
+        '</div>';
+      list.appendChild(card);
+      const sel=document.getElementById('col-'+id);REF.colaboradores.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});
+      if(teamCount()===1)setTit(id);
+      updTeamCnt();
+    }
+    function rmMember(id){const el=document.getElementById('m-'+id);const wasTit=document.getElementById('tit-'+id).classList.contains('bg-g-blue');el.remove();if(wasTit){const f=document.querySelector('[id^="m-"]');if(f)setTit(parseInt(f.id.replace('m-','')));}updTeamCnt();}
+    function setTit(id){document.querySelectorAll('[id^="tit-"]').forEach(b=>{b.classList.remove('bg-g-blue','text-white','border-g-blue');b.classList.add('text-g-hint','border-g-border');});const b=document.getElementById('tit-'+id);if(b){b.classList.add('bg-g-blue','text-white','border-g-blue');b.classList.remove('text-g-hint','border-g-border');}}
+    function teamCount(){return document.querySelectorAll('[id^="m-"]').length;}
+    function updTeamCnt(){document.getElementById('teamCnt').textContent=teamCount()+' profissionais';}
+    function parseDec(v){return v?parseFloat(String(v).replace(',','.')):NaN;}
+
+    function getTeam(){
+      const team=[];
+      document.querySelectorAll('[id^="m-"]').forEach(card=>{
+        const id=card.id.replace('m-','');
+        team.push({colaborador:document.getElementById('col-'+id).value,funcao:document.getElementById('fun-'+id).value,area:parseDec(document.getElementById('area-'+id).value),preco:parseDec(document.getElementById('prc-'+id).value),titular:document.getElementById('tit-'+id).classList.contains('bg-g-blue')});
+      });
+      return team;
+    }
+
+    // ===== SAVE FRENTE =====
+    async function salvarFrente(){
+      document.querySelectorAll('.error').forEach(e=>e.classList.remove('error'));
+      let ok=true,first=null;
+      function err(el){el.classList.add('error');if(!first)first=el;ok=false;}
+      if(!document.getElementById('resp').value.trim()){toast('Preencha "Preenchido por"','error');return;}
+      ['obra','pav','amb','svc','dtIni'].forEach(id=>{const el=document.getElementById(id);if(!el.value.trim())err(el);});
+      const team=getTeam();
+      if(team.length===0){toast('Adicione ao menos 1 profissional','error');return;}
+      let hasTit=false;
+      for(const m of team){
+        if(!m.colaborador||isNaN(m.area)||m.area<0||isNaN(m.preco)||m.preco<0){toast('Complete os dados de todos os profissionais','error');ok=false;break;}
+        if(m.titular)hasTit=true;
+      }
+      if(!hasTit&&team.length>0){toast('Defina um profissional como Titular','error');return;}
+      if(!ok){if(first){first.scrollIntoView({behavior:'smooth',block:'center'});}return;}
+
+      const btn=document.getElementById('btnSalvar');btn.classList.add('bl');btn.disabled=true;
+      try{
+        const {data:atv,error:e1}=await db.from('atividades').insert({
+          obra:document.getElementById('obra').value,pavimento:document.getElementById('pav').value,
+          ambiente:document.getElementById('amb').value.trim(),servico:document.getElementById('svc').value,
+          data_inicio:document.getElementById('dtIni').value,observacoes:document.getElementById('obs').value.trim(),
+          criado_por:document.getElementById('resp').value.trim()
+        }).select().single();
+        if(e1)throw e1;
+        const prods=team.map(m=>({atividade_id:atv.id,profissional:m.colaborador,funcao:m.funcao,area_m2:m.area,preco_unit:m.preco,titular:m.titular}));
+        const {error:e2}=await db.from('producao').insert(prods);
+        if(e2)throw e2;
+        toast('Frente criada com '+team.length+' profissional(is)!','success');
+        // Reset
+        document.getElementById('svc').value='';document.getElementById('amb').value='';document.getElementById('obs').value='';
+        document.getElementById('teamList').innerHTML='';memberC=0;addMember();
+      }catch(e){toast('Erro ao salvar: '+(e.message||e),'error');console.error(e);}
+      finally{btn.classList.remove('bl');btn.disabled=false;}
+    }
+
+    // ===== EM ANDAMENTO =====
+    let andData=[];
+    async function loadAndamento(){
+      document.getElementById('andLoad').classList.remove('hidden');
+      document.getElementById('andList').innerHTML='';document.getElementById('andEmpty').classList.add('hidden');
+      try{
+        const {data,error}=await db.from('atividades').select('*, producao(*)').eq('status','em_andamento').order('created_at',{ascending:false});
+        if(error)throw error;
+        andData=data||[];
+        document.getElementById('cntAnd').textContent=andData.length;
+      }catch(e){console.error(e);andData=[];}
+      document.getElementById('andLoad').classList.add('hidden');
+      renderAndamento();
+    }
+    function renderAndamento(){
+      const list=document.getElementById('andList');list.innerHTML='';
+      const meus=document.getElementById('filtroMeus').checked;
+      const myName=document.getElementById('resp').value.trim();
+      let d=andData;
+      if(meus&&myName)d=d.filter(a=>a.criado_por===myName);
+      if(!d.length){document.getElementById('andEmpty').classList.remove('hidden');return;}
+      document.getElementById('andEmpty').classList.add('hidden');
+      d.forEach((a,i)=>{
+        const tit=(a.producao||[]).find(p=>p.titular);
+        const area=tit?tit.area_m2:0;
+        const card=document.createElement('div');card.className='bg-white rounded-lg shadow-md1 p-4 su card';card.style.animationDelay=(i*.03)+'s';
+        card.innerHTML=
+          '<div class="flex items-start justify-between gap-3"><div class="min-w-0 flex-1">'+
+          '<p class="text-sm font-bold text-g-text">'+esc(a.servico)+'</p>'+
+          '<p class="text-xs text-g-secondary mt-0.5">'+esc(a.obra)+' · '+esc(a.pavimento)+' · '+esc(a.ambiente)+'</p>'+
+          '<p class="text-xs text-g-hint mt-1">Início: '+fmtD(a.data_inicio)+' · '+(a.producao||[]).length+' profissional(is) · '+fmtM2(area)+'</p>'+
+          '<p class="text-xs text-g-hint">Por: '+esc(a.criado_por)+'</p></div>'+
+          '<button onclick="abrirConcluir(\''+a.id+'\',\''+esc(a.servico).replace(/'/g,"")+'\')" class="flex-shrink-0 h-9 px-3 bg-g-greenBg text-g-green text-xs font-medium rounded-lg hover:bg-g-green hover:text-white transition-colors">✓ Concluir</button>'+
+          '</div>';
+        list.appendChild(card);
+      });
+    }
+
+    // ===== CONCLUIR =====
+    function abrirConcluir(id,svc){concluirId=id;document.getElementById('modalInfo').textContent=svc;document.getElementById('dtFim').value=new Date().toISOString().split('T')[0];document.getElementById('modalConcluir').classList.remove('hidden');document.getElementById('modalConcluir').classList.add('flex');}
+    function fecharModal(){document.getElementById('modalConcluir').classList.add('hidden');document.getElementById('modalConcluir').classList.remove('flex');concluirId=null;}
+    async function confirmarConclusao(){
+      const dt=document.getElementById('dtFim').value;if(!dt){toast('Informe a data de conclusão','error');return;}
+      const btn=document.getElementById('btnConcluir');btn.classList.add('bl');btn.disabled=true;
+      try{
+        const {error}=await db.from('atividades').update({data_fim:dt}).eq('id',concluirId);
+        if(error)throw error;
+        toast('Frente concluída!','success');fecharModal();loadAndamento();
+      }catch(e){toast('Erro ao concluir: '+(e.message||e),'error');console.error(e);}
+      finally{btn.classList.remove('bl');btn.disabled=false;}
+    }
+
+    // ===== CONCLUÍDAS =====
+    async function loadConcluidas(){
+      document.getElementById('concLoad').classList.remove('hidden');
+      document.getElementById('concList').innerHTML='';document.getElementById('concEmpty').classList.add('hidden');
+      try{
+        const {data,error}=await db.from('atividades').select('*, producao(*)').eq('status','concluida').order('data_fim',{ascending:false}).limit(50);
+        if(error)throw error;
+        const list=document.getElementById('concList');
+        if(!data||!data.length){document.getElementById('concEmpty').classList.remove('hidden');}
+        else{(data||[]).forEach((a,i)=>{
+          const tit=(a.producao||[]).find(p=>p.titular);const area=tit?tit.area_m2:0;
+          const card=document.createElement('div');card.className='bg-white rounded-lg shadow-md1 p-4 su';card.style.animationDelay=(i*.02)+'s';
+          card.innerHTML='<div class="flex items-start justify-between gap-3"><div class="min-w-0 flex-1"><p class="text-sm font-bold text-g-text">'+esc(a.servico)+'</p><p class="text-xs text-g-secondary mt-0.5">'+esc(a.obra)+' · '+esc(a.pavimento)+' · '+esc(a.ambiente)+'</p><p class="text-xs text-g-hint mt-1">'+fmtD(a.data_inicio)+' → '+fmtD(a.data_fim)+' · '+fmtM2(area)+'</p></div><span class="text-xs font-medium px-2 py-1 rounded-full bg-g-greenBg text-g-green flex-shrink-0">✓ Concluída</span></div>';
+          list.appendChild(card);
+        });}
+      }catch(e){console.error(e);document.getElementById('concEmpty').classList.remove('hidden');}
+      document.getElementById('concLoad').classList.add('hidden');
+    }
+
+    // ===== MEDIÇÃO =====
+    async function loadMedicao(){
+      document.getElementById('medLoad').classList.remove('hidden');
+      document.getElementById('medList').innerHTML='';document.getElementById('medEmpty').classList.add('hidden');document.getElementById('medTotal').classList.add('hidden');
+      try{
+        const {data,error}=await db.from('vw_medicao').select('*');
+        if(error)throw error;
+        medData=data||[];
+        const obras=[...new Set(medData.map(m=>m.obra))].sort();
+        const ciclos=[...new Set(medData.map(m=>m.ciclo))].sort().reverse();
+        const os=document.getElementById('medObra'),cs=document.getElementById('medCiclo');
+        os.innerHTML='<option value="">Todas obras</option>';obras.forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;os.appendChild(op);});
+        cs.innerHTML='<option value="">Todos ciclos</option>';ciclos.forEach(c=>{const op=document.createElement('option');op.value=c;op.textContent=c;cs.appendChild(op);});
+      }catch(e){console.error(e);medData=[];}
+      document.getElementById('medLoad').classList.add('hidden');
+      renderMedicao();
+    }
+    function renderMedicao(){
+      const list=document.getElementById('medList');list.innerHTML='';
+      const fo=document.getElementById('medObra').value,fc=document.getElementById('medCiclo').value;
+      let d=medData;
+      if(fo)d=d.filter(m=>m.obra===fo);
+      if(fc)d=d.filter(m=>m.ciclo===fc);
+      if(!d.length){document.getElementById('medEmpty').classList.remove('hidden');return;}
+      document.getElementById('medEmpty').classList.add('hidden');
+      const totVal=d.reduce((s,m)=>s+Number(m.valor_faturar||0),0);
+      const totM2=d.reduce((s,m)=>s+Number(m.m2_executado||0),0);
+      document.getElementById('medTotal').classList.remove('hidden');
+      document.getElementById('medTotalVal').textContent=fmtBR(totVal);
+      document.getElementById('medTotalM2').textContent=fmtM2(totM2);
+      d.sort((a,b)=>(b.ciclo||'').localeCompare(a.ciclo||'')).forEach((m,i)=>{
+        const semContrato=!m.preco_m2_contrato;
+        const card=document.createElement('div');card.className='bg-white rounded-lg shadow-md1 p-4 su';card.style.animationDelay=(i*.02)+'s';
+        card.innerHTML='<div class="flex items-start justify-between gap-3"><div class="min-w-0 flex-1"><p class="text-sm font-bold text-g-text">'+esc(m.obra)+'</p><p class="text-xs text-g-secondary mt-0.5">'+esc(m.servico)+'</p><p class="text-xs text-g-hint mt-1">Ciclo '+esc(m.ciclo)+' · '+fmtM2(m.m2_executado)+(m.preco_m2_contrato?' × '+fmtBR(m.preco_m2_contrato):'')+'</p>'+(semContrato?'<p class="text-xs text-g-amber mt-1 font-medium">⚠ Sem preço de contrato cadastrado</p>':'')+'</div><div class="text-right flex-shrink-0"><p class="text-base font-bold text-g-blue">'+fmtBR(m.valor_faturar)+'</p><p class="text-xs text-g-hint">a faturar</p></div></div>';
+        list.appendChild(card);
+      });
+    }
+
+    // ===== PRODUÇÃO =====
+    async function loadProducao(){
+      document.getElementById('prodLoad').classList.remove('hidden');
+      document.getElementById('prodList').innerHTML='';document.getElementById('prodEmpty').classList.add('hidden');document.getElementById('prodTotal').classList.add('hidden');
+      try{
+        const {data,error}=await db.from('vw_producao_mo').select('*');
+        if(error)throw error;
+        prodData=data||[];
+        const meses=[...new Set(prodData.map(p=>p.mes))].sort().reverse();
+        const profs=[...new Set(prodData.map(p=>p.profissional))].sort();
+        const ms=document.getElementById('prodMes'),ps=document.getElementById('prodProf');
+        ms.innerHTML='<option value="">Todos meses</option>';meses.forEach(m=>{const op=document.createElement('option');op.value=m;op.textContent=m;ms.appendChild(op);});
+        ps.innerHTML='<option value="">Todos profissionais</option>';profs.forEach(p=>{const op=document.createElement('option');op.value=p;op.textContent=p;ps.appendChild(op);});
+      }catch(e){console.error(e);prodData=[];}
+      document.getElementById('prodLoad').classList.add('hidden');
+      renderProducao();
+    }
+    function renderProducao(){
+      const list=document.getElementById('prodList');list.innerHTML='';
+      const fm=document.getElementById('prodMes').value,fp=document.getElementById('prodProf').value;
+      let d=prodData;
+      if(fm)d=d.filter(p=>p.mes===fm);
+      if(fp)d=d.filter(p=>p.profissional===fp);
+      if(!d.length){document.getElementById('prodEmpty').classList.remove('hidden');return;}
+      document.getElementById('prodEmpty').classList.add('hidden');
+      const tot=d.reduce((s,p)=>s+Number(p.valor_mo||0),0);
+      document.getElementById('prodTotal').classList.remove('hidden');
+      document.getElementById('prodTotalVal').textContent=fmtBR(tot);
+      // Group by professional
+      const byProf={};
+      d.forEach(p=>{if(!byProf[p.profissional])byProf[p.profissional]={total:0,m2:0,items:[]};byProf[p.profissional].total+=Number(p.valor_mo||0);byProf[p.profissional].m2+=Number(p.m2_produzido||0);byProf[p.profissional].items.push(p);});
+      Object.entries(byProf).sort((a,b)=>b[1].total-a[1].total).forEach(([prof,info],i)=>{
+        const card=document.createElement('div');card.className='bg-white rounded-lg shadow-md1 p-4 su';card.style.animationDelay=(i*.02)+'s';
+        let itemsHtml=info.items.map(it=>'<div class="flex justify-between text-xs text-g-secondary py-1 border-t border-g-divider"><span>'+esc(it.obra)+' · '+esc(it.servico)+' ('+esc(it.funcao)+')</span><span class="font-medium">'+fmtM2(it.m2_produzido)+' × '+fmtBR(it.preco_unit)+' = '+fmtBR(it.valor_mo)+'</span></div>').join('');
+        card.innerHTML='<div class="flex items-start justify-between gap-3 mb-2"><div><p class="text-sm font-bold text-g-text">'+esc(prof)+'</p><p class="text-xs text-g-hint">'+fmtM2(info.m2)+' no período</p></div><p class="text-base font-bold text-g-green flex-shrink-0">'+fmtBR(info.total)+'</p></div>'+itemsHtml;
+        list.appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>
