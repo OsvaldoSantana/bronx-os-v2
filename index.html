@@ -150,6 +150,7 @@ select.f{cursor:pointer;-webkit-appearance:none;appearance:none;background-image
   <div class="mb-3">
     <p class="sl mb-1" id="etapaNome">Etapa</p>
   </div>
+  <div id="etapaBar" class="mb-3 hidden"></div>
   <div id="ckItems" class="space-y-3"></div>
 
   <!-- Navegação entre etapas -->
@@ -381,7 +382,8 @@ async function openFVS(id){
     fvs=data;
     fvs.fvs_itens.sort((a,b)=>{if(a.is_revistoria!==b.is_revistoria)return a.is_revistoria?1:-1;return a.id-b.id;});
     fvs.etapasList=REF.checklists[fvs.servico].etapas.map(e=>e.nome);
-    fvs.curEtapa=Math.min(fvs.etapa_atual||0,fvs.etapasList.length-1);
+    fvs.curEtapa=0; // sempre abre na primeira etapa; navega manualmente
+    fvs.editEtapa=false; // controla se a etapa atual está destravada para edição
     profEditOpen=false;
     if(fvs.status==='revistoria'){
       // Revistoria: mostra só os reprovados para reavaliar
@@ -486,28 +488,47 @@ function renderStepper(){
     wrap.appendChild(dot);
   });
 }
-function jumpEtapa(i){saveCurrentEtapa();fvs.curEtapa=i;renderCK();}
+function jumpEtapa(i){fvs.editEtapa=false;saveCurrentEtapa();fvs.curEtapa=i;renderCK();}
 function etapaItems(etapaNome){return fvs.fvs_itens.filter(it=>it.etapa===etapaNome&&!it.is_revistoria);}
+function etapaCompleta(etapaNome){const its=etapaItems(etapaNome);return its.length>0&&its.every(it=>it.resultado);}
 function renderEtapaItems(){
   const nome=fvs.etapasList[fvs.curEtapa];
   document.getElementById('etapaNome').textContent='Etapa '+(fvs.curEtapa+1)+' de '+fvs.etapasList.length+' — '+nome;
   const items=etapaItems(nome);
+  const completa=etapaCompleta(nome);
+  // Etapa preenchida fica travada, a menos que o usuário tenha clicado em Editar
+  const travada=completa&&!fvs.editEtapa;
+  // Barra de status da etapa (travada + botão editar)
+  const bar=document.getElementById('etapaBar');
+  if(travada){
+    bar.classList.remove('hidden');
+    bar.innerHTML='<div class="flex items-center justify-between bg-g-greenBg rounded-lg px-3 py-2"><span class="text-xs font-medium text-g-green">✓ Etapa preenchida e salva</span><button onclick="editarEtapa()" class="text-xs font-medium text-g-blue px-3 py-1 rounded-md bg-white border border-g-border">✎ Editar etapa</button></div>';
+  }else if(completa&&fvs.editEtapa){
+    bar.classList.remove('hidden');
+    bar.innerHTML='<div class="flex items-center justify-between bg-g-amberBg rounded-lg px-3 py-2"><span class="text-xs font-medium text-g-amber">✎ Editando — as alterações são salvas automaticamente</span><button onclick="travarEtapa()" class="text-xs font-medium text-g-secondary px-3 py-1 rounded-md bg-white border border-g-border">Concluir edição</button></div>';
+  }else{
+    bar.classList.add('hidden');
+  }
   const wrap=document.getElementById('ckItems');wrap.innerHTML='';
   items.forEach((it)=>{
-    const card=document.createElement('div');card.className='bg-white rounded-lg shadow-md1 p-4 su';
+    const card=document.createElement('div');card.className='bg-white rounded-lg shadow-md1 p-4 su'+(travada?' opacity-90':'');
     const r=it.resultado||'';
+    const dis=travada?' disabled style="cursor:default"':'';
+    const onclickAttr=travada?'':' onclick="setRes('+it.id+',';
     card.innerHTML='<p class="text-sm text-g-text mb-3">'+esc(it.criterio)+'</p>'+
       '<div class="flex gap-2 mb-2">'+
-      '<button class="opt aprovado'+(r==='Aprovado'?' sel':'')+'" onclick="setRes('+it.id+',\'Aprovado\')">Aprovado</button>'+
-      '<button class="opt reprovado'+(r==='Reprovado'?' sel':'')+'" onclick="setRes('+it.id+',\'Reprovado\')">Reprovado</button>'+
+      '<button class="opt aprovado'+(r==='Aprovado'?' sel':'')+'"'+(travada?'':' onclick="setRes('+it.id+',\'Aprovado\')"')+dis+'>Aprovado</button>'+
+      '<button class="opt reprovado'+(r==='Reprovado'?' sel':'')+'"'+(travada?'':' onclick="setRes('+it.id+',\'Reprovado\')"')+dis+'>Reprovado</button>'+
       '</div><div class="flex gap-2">'+
-      '<button class="opt corrigido'+(r==='Corrigido'?' sel':'')+'" onclick="setRes('+it.id+',\'Corrigido\')">Corrigido</button>'+
-      '<button class="opt na'+(r==='N/A'?' sel':'')+'" onclick="setRes('+it.id+',\'N/A\')">N/A</button>'+
+      '<button class="opt corrigido'+(r==='Corrigido'?' sel':'')+'"'+(travada?'':' onclick="setRes('+it.id+',\'Corrigido\')"')+dis+'>Corrigido</button>'+
+      '<button class="opt na'+(r==='N/A'?' sel':'')+'"'+(travada?'':' onclick="setRes('+it.id+',\'N/A\')"')+dis+'>N/A</button>'+
       '</div>'+
-      '<input type="text" placeholder="Observação (opcional)" value="'+esc(it.observacao||'')+'" onchange="setObs('+it.id+',this.value)" class="f h-10 mt-3 text-sm">';
+      '<input type="text" placeholder="Observação (opcional)" value="'+esc(it.observacao||'')+'" '+(travada?'readonly':'onchange="setObs('+it.id+',this.value)"')+' class="f h-10 mt-3 text-sm'+(travada?' bg-g-bg':'')+'">';
     wrap.appendChild(card);
   });
 }
+function editarEtapa(){fvs.editEtapa=true;renderEtapaItems();}
+function travarEtapa(){fvs.editEtapa=false;renderEtapaItems();}
 async function setRes(itemId,res){
   const it=fvs.fvs_itens.find(x=>x.id===itemId);if(!it)return;
   it.resultado=res;if(!it.data_1a)it.data_1a=new Date().toISOString().split('T')[0];
@@ -538,7 +559,7 @@ async function saveCurrentEtapa(){
 }
 
 // ===== NAVEGAÇÃO ENTRE ETAPAS =====
-function prevEtapa(){if(fvs.curEtapa>0){fvs.curEtapa--;saveCurrentEtapa();renderCK();}}
+function prevEtapa(){if(fvs.curEtapa>0){fvs.curEtapa--;fvs.editEtapa=false;saveCurrentEtapa();renderCK();}}
 async function nextEtapa(){
   // validate current etapa fully answered
   const nome=fvs.etapasList[fvs.curEtapa];
@@ -561,7 +582,7 @@ function abrirEtapaModal(etapaConcluida){
   document.getElementById('etapaModal').classList.add('flex');
 }
 function fecharEtapaModal(){document.getElementById('etapaModal').classList.add('hidden');document.getElementById('etapaModal').classList.remove('flex');}
-function modalIrProxima(){fecharEtapaModal();fvs.curEtapa++;saveCurrentEtapa();renderCK();}
+function modalIrProxima(){fecharEtapaModal();fvs.curEtapa++;fvs.editEtapa=false;saveCurrentEtapa();renderCK();}
 function modalVoltarInicio(){fecharEtapaModal();goHome();}
 function updateNavButtons(){
   document.getElementById('btnPrev').disabled=fvs.curEtapa===0;
