@@ -57,6 +57,7 @@
       <button onclick="go('concluidas')" id="tab-concluidas" class="tab">Concluídas</button>
       <button onclick="go('medicao')" id="tab-medicao" class="tab">Medição</button>
       <button onclick="go('producao')" id="tab-producao" class="tab">Produção</button>
+      <button onclick="go('kpis')" id="tab-kpis" class="tab">📊 KPIs</button>
     </div></div>
   </header>
 
@@ -176,6 +177,46 @@
     <div id="prodEmpty" class="text-center py-8 text-sm text-g-hint hidden">Nenhuma produção registrada</div>
   </main>
 
+  <!-- ===== KPIs ===== -->
+  <main id="vKpis" class="max-w-3xl mx-auto px-4 py-5 hidden">
+    <div class="flex items-center justify-between mb-3">
+      <p class="sl mb-0">Indicadores de Produção</p>
+      <button onclick="loadKpis()" class="text-xs text-g-blue font-medium hover:underline">↻ Atualizar</button>
+    </div>
+    <div class="mb-4">
+      <select id="kpiMes" onchange="renderKpis()" class="f h-9 text-xs w-auto min-w-[160px]"><option value="">Todos os meses</option></select>
+    </div>
+    <div id="kpiLoad" class="text-center py-8 text-sm text-g-hint">Carregando...</div>
+    <div id="kpiEmpty" class="text-center py-8 text-sm text-g-hint hidden">Sem dados de produção no período</div>
+    <div id="kpiContent" class="space-y-5 hidden">
+      <!-- Ranking Coordenadores -->
+      <div>
+        <p class="sl">🏅 Ranking de Coordenadores (m² da equipe)</p>
+        <div id="kpiCoord" class="space-y-2"></div>
+      </div>
+      <!-- Ranking Encarregados -->
+      <div>
+        <p class="sl">👷 Ranking de Encarregados (m² da equipe)</p>
+        <div id="kpiEnc" class="space-y-2"></div>
+      </div>
+      <!-- Ranking Colaboradores -->
+      <div>
+        <p class="sl">🥇 Ranking de Colaboradores (m² produzido)</p>
+        <div id="kpiColab" class="space-y-2"></div>
+      </div>
+      <!-- Produção média por serviço -->
+      <div>
+        <p class="sl">📐 Produção por Serviço</p>
+        <div id="kpiServ" class="space-y-2"></div>
+      </div>
+      <!-- Ranking obras por serviço -->
+      <div>
+        <p class="sl">🏗 Ranking de Obras (m² por serviço)</p>
+        <div id="kpiObra" class="space-y-2"></div>
+      </div>
+    </div>
+  </main>
+
   <!-- ===== CONCLUIR MODAL ===== -->
   <div id="modalConcluir" class="fixed inset-0 bg-black/40 z-[90] hidden items-center justify-center p-4">
     <div class="bg-white rounded-lg shadow-md2 p-6 max-w-sm w-full">
@@ -197,7 +238,7 @@
     const SB_KEY="sb_publishable_bkvDYXXBk_OA9dWBSnK6lw_0DeOou9N";
     const db=supabase.createClient(SB_URL,SB_KEY);
     let REF=null,memberC=0,concluirId=null,medData=[],prodData=[],andData=[],tipoAtual='medido';
-    const VIEWS={novo:'vNovo',andamento:'vAndamento',concluidas:'vConcluidas',medicao:'vMedicao',producao:'vProducao'};
+    const VIEWS={novo:'vNovo',andamento:'vAndamento',concluidas:'vConcluidas',medicao:'vMedicao',producao:'vProducao',kpis:'vKpis'};
     const TIPO_DESC={
       medido:'Serviço medido por m² — entra na medição (faturamento) e na produção.',
       diaria:'Diária de Sábado/Domingo/Feriado — valor fixo por profissional. Não entra na medição.',
@@ -221,6 +262,7 @@
       if(tab==='concluidas')loadConcluidas();
       if(tab==='medicao')loadMedicao();
       if(tab==='producao')loadProducao();
+      if(tab==='kpis')loadKpis();
     }
 
     // ===== TIPO DE LANÇAMENTO =====
@@ -565,6 +607,60 @@
         card.innerHTML='<div class="flex items-start justify-between gap-3 mb-2"><div><p class="text-sm font-bold text-g-text">'+esc(prof)+'</p>'+(info.m2>0?'<p class="text-xs text-g-hint">'+fmtM2(info.m2)+' no período</p>':'')+'</div><p class="text-base font-bold text-g-green flex-shrink-0">'+fmtBR(info.total)+'</p></div>'+itemsHtml;
         list.appendChild(card);
       });
+    }
+
+    // ===== KPIs =====
+    function loadKpis(){
+      // Reuse prodData if loaded, else fetch
+      if(prodData.length===0){
+        document.getElementById('kpiLoad').classList.remove('hidden');
+        document.getElementById('kpiContent').classList.add('hidden');
+        db.from('vw_producao_mo').select('*').then(({data,error})=>{
+          if(!error)prodData=data||[];
+          setupKpiMes();renderKpis();
+        });
+      }else{setupKpiMes();renderKpis();}
+    }
+    function setupKpiMes(){
+      const meses=[...new Set(prodData.map(p=>p.mes))].sort().reverse();
+      const ms=document.getElementById('kpiMes');
+      const cur=ms.value;
+      ms.innerHTML='<option value="">Todos os meses</option>';
+      meses.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;ms.appendChild(o);});
+      if(cur)ms.value=cur;
+    }
+    function rankCard(nome,valor,sub,i,cor){
+      const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'º';
+      return '<div class="bg-white rounded-lg shadow-md1 p-3 flex items-center justify-between su" style="animation-delay:'+(i*.03)+'s"><div class="flex items-center gap-3 min-w-0"><span class="text-base font-bold w-8 text-center flex-shrink-0">'+medal+'</span><div class="min-w-0"><p class="text-sm font-bold text-g-text truncate">'+esc(nome)+'</p>'+(sub?'<p class="text-xs text-g-hint">'+sub+'</p>':'')+'</div></div><p class="text-sm font-bold flex-shrink-0 ml-2" style="color:'+cor+'">'+valor+'</p></div>';
+    }
+    function renderKpis(){
+      const fm=document.getElementById('kpiMes').value;
+      let d=prodData;if(fm)d=d.filter(p=>p.mes===fm);
+      // Only 'medido' entries count for m² rankings
+      const dm=d.filter(p=>p.tipo_remuneracao==='medido');
+      document.getElementById('kpiLoad').classList.add('hidden');
+      if(!d.length){document.getElementById('kpiEmpty').classList.remove('hidden');document.getElementById('kpiContent').classList.add('hidden');return;}
+      document.getElementById('kpiEmpty').classList.add('hidden');document.getElementById('kpiContent').classList.remove('hidden');
+
+      // 1. Coordenadores (m²)
+      const coord={};dm.forEach(p=>{if(!p.coordenador)return;coord[p.coordenador]=(coord[p.coordenador]||0)+Number(p.m2_produzido||0);});
+      document.getElementById('kpiCoord').innerHTML=Object.entries(coord).sort((a,b)=>b[1]-a[1]).map(([n,v],i)=>rankCard(n,fmtM2(v),null,i,'#1a73e8')).join('')||'<p class="text-xs text-g-hint">Sem dados</p>';
+
+      // 2. Encarregados (m²)
+      const enc={};dm.forEach(p=>{if(!p.encarregado)return;enc[p.encarregado]=(enc[p.encarregado]||0)+Number(p.m2_produzido||0);});
+      document.getElementById('kpiEnc').innerHTML=Object.entries(enc).sort((a,b)=>b[1]-a[1]).map(([n,v],i)=>rankCard(n,fmtM2(v),null,i,'#137333')).join('')||'<p class="text-xs text-g-hint">Sem dados</p>';
+
+      // 3. Colaboradores (m²)
+      const colab={};dm.forEach(p=>{colab[p.profissional]=(colab[p.profissional]||0)+Number(p.m2_produzido||0);});
+      document.getElementById('kpiColab').innerHTML=Object.entries(colab).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([n,v],i)=>rankCard(n,fmtM2(v),null,i,'#137333')).join('')||'<p class="text-xs text-g-hint">Sem dados</p>';
+
+      // 4. Produção por serviço (m² total + média por frente)
+      const serv={};dm.forEach(p=>{if(!serv[p.servico])serv[p.servico]={m2:0,n:0};serv[p.servico].m2+=Number(p.m2_produzido||0);serv[p.servico].n++;});
+      document.getElementById('kpiServ').innerHTML=Object.entries(serv).sort((a,b)=>b[1].m2-a[1].m2).map(([n,info],i)=>rankCard(n,fmtM2(info.m2),'média '+fmtM2(info.m2/info.n)+'/lançamento',i,'#1a73e8')).join('')||'<p class="text-xs text-g-hint">Sem dados</p>';
+
+      // 5. Obras por serviço (m²) - top combos
+      const obra={};dm.forEach(p=>{const k=p.obra+' · '+p.servico;obra[k]=(obra[k]||0)+Number(p.m2_produzido||0);});
+      document.getElementById('kpiObra').innerHTML=Object.entries(obra).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([n,v],i)=>rankCard(n,fmtM2(v),null,i,'#b06000')).join('')||'<p class="text-xs text-g-hint">Sem dados</p>';
     }
   </script>
 </body>
