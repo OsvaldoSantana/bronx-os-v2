@@ -1,670 +1,648 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, interactive-widget=resizes-visual">
-  <meta name="theme-color" content="#ffffff">
-  <title>OS Produção — Bronx</title>
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    tailwind.config={theme:{extend:{
-      fontFamily:{sans:['Google Sans','Roboto','sans-serif']},
-      colors:{g:{bg:'#f8f9fa',surface:'#fff',border:'#dadce0',divider:'#e8eaed',text:'#202124',secondary:'#5f6368',hint:'#80868b',blue:'#1a73e8',blueHover:'#1557b0',blueBg:'#e8f0fe',green:'#137333',greenBg:'#e6f4ea',red:'#c5221f',redBg:'#fce8e6',amber:'#b06000',amberBg:'#fef7e0',purple:'#8430ce',purpleBg:'#f3e8fd'}},
-      boxShadow:{'md1':'0 1px 2px 0 rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15)','md2':'0 1px 3px 0 rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.15)'}
-    }}}
-  </script>
-  <style>
-    *{-webkit-tap-highlight-color:transparent}body{overscroll-behavior:none}select,input,textarea{font-size:16px!important}
-    .f{width:100%;height:48px;padding:0 12px;background:#fff;border:1px solid #dadce0;border-radius:8px;font-size:14px;color:#202124;outline:none;transition:border .15s,box-shadow .15s}
-    .f:focus{border-color:#1a73e8;box-shadow:0 0 0 2px #e8f0fe}.f.error{border-color:#c5221f;box-shadow:0 0 0 2px #fce8e6}.f::placeholder{color:#80868b}
-    textarea.f{height:auto;padding:12px;resize:none}
-    select.f{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235f6368' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
-    .fg{transition:opacity .2s}.fg.disabled{opacity:.35;pointer-events:none}
-    .sl{font-size:11px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;color:#5f6368;margin-bottom:12px}
-    .fl{display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:6px}
-    .su{animation:su .3s ease both}@keyframes su{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    .toast{animation:ti .25s ease,to .25s ease 3.2s forwards}@keyframes ti{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}@keyframes to{from{opacity:1}to{opacity:0;transform:translateY(-20px)}}
-    .bl{position:relative;color:transparent!important}.bl::after{content:'';position:absolute;width:20px;height:20px;top:50%;left:50%;margin:-10px 0 0 -10px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
-    .tab{padding:10px 14px;font-size:13px;font-weight:500;border-bottom:2px solid transparent;color:#5f6368;cursor:pointer;white-space:nowrap;transition:all .15s}
-    .tab.active{border-bottom-color:#1a73e8;color:#1a73e8}
-    .tabs-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}.tabs-scroll::-webkit-scrollbar{display:none}
-    .card{transition:all .15s}.card:hover{box-shadow:0 1px 3px 0 rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.15)}
-    .tipo-btn{flex:1;min-width:0;padding:12px 6px;border:2px solid #dadce0;border-radius:10px;background:#fff;cursor:pointer;transition:all .15s;text-align:center}
-    .tipo-btn.active{border-color:#1a73e8;background:#e8f0fe}
-    .tipo-btn .ti{font-size:18px;display:block;margin-bottom:2px}.tipo-btn .tl{font-size:10px;font-weight:600;color:#5f6368;line-height:1.1}
-    .tipo-btn.active .tl{color:#1a73e8}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, interactive-widget=resizes-visual">
+<meta name="theme-color" content="#ffffff">
+<title>FVS — Bronx</title>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+tailwind.config={theme:{extend:{
+  fontFamily:{sans:['Google Sans','Roboto','sans-serif']},
+  colors:{g:{bg:'#f8f9fa',surface:'#fff',border:'#dadce0',divider:'#e8eaed',text:'#202124',secondary:'#5f6368',hint:'#80868b',blue:'#1a73e8',blueHover:'#1557b0',blueBg:'#e8f0fe',green:'#137333',greenBg:'#e6f4ea',red:'#c5221f',redBg:'#fce8e6',amber:'#b06000',amberBg:'#fef7e0',purple:'#8430ce',purpleBg:'#f3e8fd'}},
+  boxShadow:{'md1':'0 1px 2px 0 rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15)','md2':'0 1px 3px 0 rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.15)'}
+}}}
+</script>
+<style>
+*{-webkit-tap-highlight-color:transparent}body{overscroll-behavior:none}select,input,textarea{font-size:16px!important}
+.f{width:100%;height:48px;padding:0 12px;background:#fff;border:1px solid #dadce0;border-radius:8px;font-size:14px;color:#202124;outline:none;transition:border .15s,box-shadow .15s}
+.f:focus{border-color:#1a73e8;box-shadow:0 0 0 2px #e8f0fe}.f.error{border-color:#c5221f;box-shadow:0 0 0 2px #fce8e6}.f::placeholder{color:#80868b}
+textarea.f{height:auto;padding:12px;resize:none}
+select.f{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235f6368' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.fg{transition:opacity .2s}.fg.disabled{opacity:.35;pointer-events:none}
+.sl{font-size:11px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;color:#5f6368;margin-bottom:12px}
+.fl{display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:6px}
+.su{animation:su .3s ease both}@keyframes su{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.toast{animation:ti .25s ease,to .25s ease 3.2s forwards}@keyframes ti{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}@keyframes to{from{opacity:1}to{opacity:0;transform:translateY(-20px)}}
+.bl{position:relative;color:transparent!important}.bl::after{content:'';position:absolute;width:20px;height:20px;top:50%;left:50%;margin:-10px 0 0 -10px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+.tab{padding:10px 14px;font-size:13px;font-weight:500;border-bottom:2px solid transparent;color:#5f6368;cursor:pointer;white-space:nowrap;transition:all .15s}
+.tab.active{border-bottom-color:#1a73e8;color:#1a73e8}
+.tabs-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}.tabs-scroll::-webkit-scrollbar{display:none}
+.card{transition:all .15s}.card:hover{box-shadow:0 1px 3px 0 rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.15)}
+.opt{flex:1;height:44px;border:2px solid #dadce0;border-radius:8px;background:#fff;font-size:13px;font-weight:600;color:#5f6368;cursor:pointer;transition:all .12s}
+.opt.aprovado.sel{background:#e6f4ea;border-color:#137333;color:#137333}
+.opt.reprovado.sel{background:#fce8e6;border-color:#c5221f;color:#c5221f}
+.opt.corrigido.sel{background:#fef7e0;border-color:#b06000;color:#b06000}
+.opt.na.sel{background:#f1f3f4;border-color:#5f6368;color:#5f6368}
+.prog{height:6px;background:#e8eaed;border-radius:3px;overflow:hidden}.prog>div{height:100%;background:#1a73e8;transition:width .3s}
+.chip{display:inline-flex;align-items:center;gap:6px;background:#e8f0fe;color:#1a73e8;padding:5px 10px;border-radius:16px;font-size:12px;font-weight:500;margin:2px}
+.chip button{background:none;border:none;color:#1a73e8;cursor:pointer;font-size:14px;line-height:1;padding:0}
+.stepdot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.stepdot.done{background:#137333;color:#fff}.stepdot.cur{background:#1a73e8;color:#fff}.stepdot.todo{background:#e8eaed;color:#80868b}
+</style>
 </head>
 <body class="bg-g-bg font-sans min-h-screen">
 
-  <header class="bg-white sticky top-0 z-50 border-b border-g-border">
-    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="#" onclick="go('novo');return false" class="flex items-center gap-3">
-        <img src="https://i.ibb.co/hx1fxsqp/Outlook-sw1reuxp.png" alt="Bronx" class="h-6" onerror="this.style.display='none'">
-        <div class="h-5 w-px bg-g-border hidden sm:block"></div>
-        <span class="text-sm font-medium text-g-secondary hidden sm:block">OS Produção</span>
-      </a>
-      <div class="flex items-center gap-2" id="connStatus">
-        <div class="w-2 h-2 rounded-full bg-g-hint"></div>
-        <span class="text-xs font-medium text-g-hint">Conectando...</span>
-      </div>
+<header class="bg-white sticky top-0 z-50 border-b border-g-border">
+  <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="#" onclick="goHome();return false" class="flex items-center gap-3">
+      <img src="https://i.ibb.co/hx1fxsqp/Outlook-sw1reuxp.png" alt="Bronx" class="h-6" onerror="this.style.display='none'">
+      <div class="h-5 w-px bg-g-border hidden sm:block"></div>
+      <span class="text-sm font-medium text-g-secondary hidden sm:block">FVS — Verificação de Serviço</span>
+    </a>
+    <div class="flex items-center gap-2" id="connStatus">
+      <div class="w-2 h-2 rounded-full bg-g-hint"></div>
+      <span class="text-xs font-medium text-g-hint">Conectando...</span>
     </div>
-    <div class="max-w-3xl mx-auto px-2 tabs-scroll"><div class="flex">
-      <button onclick="go('novo')" id="tab-novo" class="tab active">+ Novo</button>
-      <button onclick="go('andamento')" id="tab-andamento" class="tab">Em Andamento <span id="cntAnd" class="text-xs bg-g-bg px-1.5 rounded-full ml-1">0</span></button>
-      <button onclick="go('concluidas')" id="tab-concluidas" class="tab">Concluídas</button>
-      <button onclick="go('medicao')" id="tab-medicao" class="tab">Medição</button>
-      <button onclick="go('producao')" id="tab-producao" class="tab">Produção</button>
-      <button onclick="go('kpis')" id="tab-kpis" class="tab">📊 KPIs</button>
-    </div></div>
-  </header>
+  </div>
+</header>
 
-  <!-- ===== NOVO LANÇAMENTO ===== -->
-  <main id="vNovo" class="max-w-3xl mx-auto px-4 py-5">
-    <div class="bg-white rounded-lg shadow-md1 p-4 flex items-center gap-3 mb-4 su">
-      <span class="fl mb-0 whitespace-nowrap">Preenchido por <span class="text-g-red">*</span></span>
-      <input type="text" id="resp" required placeholder="Seu nome" class="f h-10" oninput="localStorage.setItem('bronx_os_resp',this.value)">
+<!-- ===== DASHBOARD ===== -->
+<main id="vDash" class="max-w-3xl mx-auto px-4 py-5">
+  <button onclick="startNew()" class="w-full h-12 bg-g-blue hover:bg-g-blueHover text-white font-medium text-sm rounded-lg shadow-md1 transition-all active:scale-[0.98] mb-5 flex items-center justify-center gap-2">+ Nova Verificação (FVS)</button>
+  <div class="tabs-scroll mb-4 border-b border-g-border"><div class="flex">
+    <button onclick="dashTab('andamento')" id="dt-andamento" class="tab active">Em Andamento <span id="cAnd" class="text-xs bg-g-bg px-1.5 rounded-full ml-1">0</span></button>
+    <button onclick="dashTab('revistoria')" id="dt-revistoria" class="tab">Revistoria <span id="cRev" class="text-xs bg-g-bg px-1.5 rounded-full ml-1">0</span></button>
+    <button onclick="dashTab('historico')" id="dt-historico" class="tab">Histórico</button>
+  </div></div>
+  <div id="dashList" class="space-y-3"></div>
+  <div id="dashLoad" class="text-center py-8 text-sm text-g-hint">Carregando...</div>
+  <div id="dashEmpty" class="text-center py-8 text-sm text-g-hint hidden">Nenhuma FVS aqui ainda</div>
+</main>
+
+<!-- ===== SELEÇÃO DE SERVIÇO (cards) ===== -->
+<main id="vSvc" class="max-w-3xl mx-auto px-4 py-5 hidden">
+  <button onclick="goHome()" class="text-sm text-g-blue font-medium mb-4 flex items-center gap-1">← Voltar ao início</button>
+  <p class="sl">Escolha o serviço a verificar</p>
+  <div id="svcCards" class="space-y-3"></div>
+</main>
+
+<!-- ===== IDENTIFICAÇÃO ===== -->
+<main id="vIdent" class="max-w-3xl mx-auto px-4 py-5 hidden">
+  <button onclick="show('vSvc')" class="text-sm text-g-blue font-medium mb-4 flex items-center gap-1">← Trocar serviço</button>
+  <div id="identSvcBadge" class="bg-g-blueBg rounded-lg p-3 mb-4 flex items-center gap-3">
+    <div id="identSvcIcon" class="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-lg flex-shrink-0"></div>
+    <div><p class="text-xs text-g-secondary">Serviço selecionado</p><p id="identSvcName" class="text-sm font-bold text-g-blue"></p></div>
+  </div>
+  <div class="bg-white rounded-lg shadow-md1 p-4 flex items-center gap-3 mb-4">
+    <span class="fl mb-0 whitespace-nowrap">Preenchido por <span class="text-g-red">*</span></span>
+    <input type="text" id="resp" placeholder="Seu nome" class="f h-10" oninput="localStorage.setItem('bronx_fvs_resp',this.value)">
+  </div>
+  <div class="bg-white rounded-lg shadow-md1 p-5 space-y-4">
+    <p class="sl mb-2">Identificação da Frente</p>
+    <div class="fg" id="fgO"><label class="fl">Obra <span class="text-g-red">*</span></label><select id="obra" class="f"><option value="">Selecione a obra</option></select>
+      <p id="encBadge" class="text-xs text-g-secondary mt-1.5 bg-g-bg rounded-md px-2 py-1.5 hidden"></p>
     </div>
-
-    <!-- Tipo de lançamento -->
-    <div class="mb-4 su">
-      <p class="sl mb-2">Tipo de Lançamento</p>
+    <div class="fg disabled" id="fgP"><label class="fl">Pavimento <span class="text-g-red">*</span></label><select id="pav" class="f"><option value="">Selecione o pavimento</option></select></div>
+    <div><label class="fl">Ambiente <span class="text-g-red">*</span></label><input type="text" id="amb" placeholder="Ex: Banheiros, Laje, Jardins" class="f"></div>
+    <div>
+      <label class="fl">Profissionais da frente</label>
       <div class="flex gap-2">
-        <button onclick="setTipo('medido')" id="tp-medido" class="tipo-btn active"><span class="ti">📐</span><span class="tl">Serviço<br>Medido</span></button>
-        <button onclick="setTipo('diaria')" id="tp-diaria" class="tipo-btn"><span class="ti">📅</span><span class="tl">Diária<br>S/D/F</span></button>
-        <button onclick="setTipo('tarefa')" id="tp-tarefa" class="tipo-btn"><span class="ti">🎯</span><span class="tl">Tarefa</span></button>
-        <button onclick="setTipo('reparo')" id="tp-reparo" class="tipo-btn"><span class="ti">🔧</span><span class="tl">Reparo</span></button>
+        <select id="profSel" class="f flex-1"><option value="">Selecione para adicionar</option></select>
+        <button onclick="addProf()" class="h-12 px-4 bg-g-blueBg text-g-blue rounded-lg text-sm font-medium whitespace-nowrap">+ Add</button>
       </div>
-      <p id="tipoDesc" class="text-xs text-g-hint mt-2 px-1"></p>
+      <div id="profChips" class="mt-2"></div>
+      <p class="text-xs text-g-hint mt-1">Pode adicionar mais de um e alterar a qualquer momento.</p>
     </div>
+    <div><label class="fl">Data de Abertura <span class="text-g-red">*</span></label><input type="date" id="dtAb" class="f"></div>
+  </div>
+  <button onclick="createFVS()" id="btnCreate" class="w-full h-12 bg-g-blue hover:bg-g-blueHover text-white font-medium text-sm rounded-lg shadow-md1 transition-all active:scale-[0.98] mt-5 mb-8">Iniciar Verificação</button>
+</main>
 
-    <div class="bg-white rounded-lg shadow-md1 p-5 space-y-4 su">
-      <p class="sl mb-2">Frente de Trabalho</p>
-      <div class="fg" id="fgO"><label class="fl">Obra <span class="text-g-red">*</span></label><select id="obra" class="f"><option value="">Selecione a obra</option></select>
-        <p id="encBadge" class="text-xs text-g-secondary mt-1.5 bg-g-bg rounded-md px-2 py-1.5 hidden"></p>
+<!-- ===== CHECKLIST ===== -->
+<main id="vCK" class="max-w-3xl mx-auto px-4 py-5 hidden">
+  <!-- Header info -->
+  <div class="bg-white rounded-lg shadow-md1 p-4 mb-4">
+    <div class="flex items-center justify-between gap-2 mb-2">
+      <button onclick="goHome()" class="text-xs text-g-blue font-medium flex items-center gap-1">← Início</button>
+      <span id="ckCode" class="text-xs text-g-hint"></span>
+    </div>
+    <h2 id="ckSvc" class="text-base font-bold text-g-text"></h2>
+    <p id="ckLoc" class="text-xs text-g-secondary mt-0.5"></p>
+    <!-- Profissionais editáveis -->
+    <div class="mt-3 pt-3 border-t border-g-divider">
+      <div class="flex items-center justify-between mb-1">
+        <span class="fl mb-0">Profissionais</span>
+        <button onclick="toggleProfEdit()" id="profEditBtn" class="text-xs text-g-blue font-medium">Editar</button>
       </div>
-      <div class="fg disabled" id="fgP"><label class="fl">Pavimento <span class="text-g-red">*</span></label><select id="pav" class="f"><option value="">Selecione o pavimento</option></select></div>
-      <div><label class="fl">Ambiente <span class="text-g-red">*</span></label><input type="text" id="amb" placeholder="Ex: Banheiros, Laje, Jardins" class="f"></div>
-      <div class="fg" id="fgS"><label class="fl">Serviço <span class="text-g-red">*</span></label><select id="svc" class="f"><option value="">Selecione o serviço</option></select><p id="svcHint" class="text-xs text-g-hint mt-1 hidden"></p></div>
-      <div><label class="fl">Data de Início <span class="text-g-red">*</span></label><input type="date" id="dtIni" class="f"></div>
-    </div>
-
-    <div class="mt-4 su">
-      <div class="flex items-center justify-between mb-3">
-        <p class="sl mb-0">Equipe</p>
-        <span id="teamCnt" class="text-xs text-g-hint font-medium">0 profissionais</span>
-      </div>
-      <div class="bg-white rounded-lg shadow-md1 p-4 space-y-3">
-        <div id="teamList" class="space-y-3"></div>
-        <button onclick="addMember()" class="w-full h-11 border-2 border-dashed border-g-border rounded-lg text-sm font-medium text-g-blue hover:bg-g-blueBg transition-colors flex items-center justify-center gap-2">+ Adicionar Profissional</button>
-      </div>
-    </div>
-
-    <div class="mt-4 su">
-      <label class="fl">Observações</label>
-      <textarea id="obs" rows="2" placeholder="Intercorrências, anotações..." class="f"></textarea>
-    </div>
-
-    <button onclick="salvarFrente()" id="btnSalvar" class="w-full h-12 bg-g-blue hover:bg-g-blueHover text-white font-medium text-sm rounded-lg shadow-md1 transition-all active:scale-[0.98] mt-5 mb-8 su">Criar Lançamento</button>
-  </main>
-
-  <!-- ===== EM ANDAMENTO ===== -->
-  <main id="vAndamento" class="max-w-3xl mx-auto px-4 py-5 hidden">
-    <div class="flex items-center justify-between mb-4">
-      <p class="sl mb-0">Frentes em Andamento</p>
-      <label class="flex items-center gap-2 text-xs text-g-secondary"><input type="checkbox" id="filtroMeus" onchange="renderAndamento()"> Só meus lançamentos</label>
-    </div>
-    <div id="andList" class="space-y-3"></div>
-    <div id="andLoad" class="text-center py-8 text-sm text-g-hint">Carregando...</div>
-    <div id="andEmpty" class="text-center py-8 text-sm text-g-hint hidden">Nenhuma frente em andamento</div>
-  </main>
-
-  <!-- ===== CONCLUÍDAS ===== -->
-  <main id="vConcluidas" class="max-w-3xl mx-auto px-4 py-5 hidden">
-    <p class="sl">Frentes Concluídas</p>
-    <div id="concList" class="space-y-3"></div>
-    <div id="concLoad" class="text-center py-8 text-sm text-g-hint">Carregando...</div>
-    <div id="concEmpty" class="text-center py-8 text-sm text-g-hint hidden">Nenhuma frente concluída</div>
-  </main>
-
-  <!-- ===== MEDIÇÃO ===== -->
-  <main id="vMedicao" class="max-w-3xl mx-auto px-4 py-5 hidden">
-    <div class="flex items-center justify-between mb-3">
-      <p class="sl mb-0">Medição por Obra (Faturamento)</p>
-      <button onclick="loadMedicao()" class="text-xs text-g-blue font-medium hover:underline">↻ Atualizar</button>
-    </div>
-    <div class="flex gap-2 mb-3 flex-wrap">
-      <select id="medObra" onchange="renderMedicao()" class="f h-9 text-xs w-auto min-w-[140px]"><option value="">Todas obras</option></select>
-      <select id="medCiclo" onchange="renderMedicao()" class="f h-9 text-xs w-auto min-w-[120px]"><option value="">Todos ciclos</option></select>
-    </div>
-    <div class="bg-white rounded-lg shadow-md1 p-3 mb-4">
-      <p class="fl mb-2">Período de conclusão (para fechar medição)</p>
-      <div class="flex gap-2 items-center">
-        <input type="date" id="medDe" onchange="renderMedicao()" class="f h-9 text-xs flex-1">
-        <span class="text-xs text-g-hint">até</span>
-        <input type="date" id="medAte" onchange="renderMedicao()" class="f h-9 text-xs flex-1">
-        <button onclick="limparPeriodo()" class="text-xs text-g-blue font-medium hover:underline whitespace-nowrap px-2">Limpar</button>
-      </div>
-    </div>
-    <div id="medTotal" class="bg-g-blueBg rounded-lg p-4 mb-4 hidden">
-      <p class="text-xs text-g-secondary">Total Executado (filtro atual)</p>
-      <p class="text-2xl font-bold text-g-blue" id="medTotalM2">0 m²</p>
-      <p class="text-xs text-g-secondary" id="medTotalFrentes">0 frentes</p>
-    </div>
-    <div id="medList" class="space-y-3"></div>
-    <div id="medLoad" class="text-center py-8 text-sm text-g-hint">Carregando...</div>
-    <div id="medEmpty" class="text-center py-8 text-sm text-g-hint hidden">Nenhuma medição registrada</div>
-  </main>
-
-  <!-- ===== PRODUÇÃO ===== -->
-  <main id="vProducao" class="max-w-3xl mx-auto px-4 py-5 hidden">
-    <div class="flex items-center justify-between mb-3">
-      <p class="sl mb-0">Produção MO (Pagamento Equipe)</p>
-      <button onclick="loadProducao()" class="text-xs text-g-blue font-medium hover:underline">↻ Atualizar</button>
-    </div>
-    <div class="flex gap-2 mb-4">
-      <select id="prodMes" onchange="renderProducao()" class="f h-9 text-xs w-auto min-w-[120px]"><option value="">Todos meses</option></select>
-      <select id="prodProf" onchange="renderProducao()" class="f h-9 text-xs w-auto min-w-[140px]"><option value="">Todos profissionais</option></select>
-    </div>
-    <div id="prodTotal" class="bg-g-greenBg rounded-lg p-4 mb-4 hidden">
-      <p class="text-xs text-g-secondary">Total de Produção a Pagar (filtro atual)</p>
-      <p class="text-2xl font-bold text-g-green" id="prodTotalVal">R$ 0,00</p>
-    </div>
-    <div id="prodList" class="space-y-3"></div>
-    <div id="prodLoad" class="text-center py-8 text-sm text-g-hint">Carregando...</div>
-    <div id="prodEmpty" class="text-center py-8 text-sm text-g-hint hidden">Nenhuma produção registrada</div>
-  </main>
-
-  <!-- ===== KPIs ===== -->
-  <main id="vKpis" class="max-w-3xl mx-auto px-4 py-5 hidden">
-    <div class="flex items-center justify-between mb-3">
-      <p class="sl mb-0">Indicadores de Produção</p>
-      <button onclick="loadKpis()" class="text-xs text-g-blue font-medium hover:underline">↻ Atualizar</button>
-    </div>
-    <div class="mb-4">
-      <select id="kpiMes" onchange="renderKpis()" class="f h-9 text-xs w-auto min-w-[160px]"><option value="">Todos os meses</option></select>
-    </div>
-    <div id="kpiLoad" class="text-center py-8 text-sm text-g-hint">Carregando...</div>
-    <div id="kpiEmpty" class="text-center py-8 text-sm text-g-hint hidden">Sem dados de produção no período</div>
-    <div id="kpiContent" class="space-y-5 hidden">
-      <!-- Ranking Coordenadores -->
-      <div>
-        <p class="sl">🏅 Ranking de Coordenadores (m² da equipe)</p>
-        <div id="kpiCoord" class="space-y-2"></div>
-      </div>
-      <!-- Ranking Encarregados -->
-      <div>
-        <p class="sl">👷 Ranking de Encarregados (m² da equipe)</p>
-        <div id="kpiEnc" class="space-y-2"></div>
-      </div>
-      <!-- Ranking Colaboradores -->
-      <div>
-        <p class="sl">🥇 Ranking de Colaboradores (m² produzido)</p>
-        <div id="kpiColab" class="space-y-2"></div>
-      </div>
-      <!-- Produção média por serviço -->
-      <div>
-        <p class="sl">📐 Produção por Serviço</p>
-        <div id="kpiServ" class="space-y-2"></div>
-      </div>
-      <!-- Ranking obras por serviço -->
-      <div>
-        <p class="sl">🏗 Ranking de Obras (m² por serviço)</p>
-        <div id="kpiObra" class="space-y-2"></div>
-      </div>
-    </div>
-  </main>
-
-  <!-- ===== CONCLUIR MODAL ===== -->
-  <div id="modalConcluir" class="fixed inset-0 bg-black/40 z-[90] hidden items-center justify-center p-4">
-    <div class="bg-white rounded-lg shadow-md2 p-6 max-w-sm w-full">
-      <h3 class="text-lg font-bold text-g-text mb-1">Concluir Frente</h3>
-      <p class="text-sm text-g-secondary mb-4" id="modalInfo"></p>
-      <label class="fl">Data de Conclusão <span class="text-g-red">*</span></label>
-      <input type="date" id="dtFim" class="f mb-4">
-      <div class="flex gap-2">
-        <button onclick="fecharModal()" class="flex-1 h-11 border border-g-border rounded-lg text-sm font-medium text-g-secondary">Cancelar</button>
-        <button onclick="confirmarConclusao()" id="btnConcluir" class="flex-1 h-11 bg-g-green text-white rounded-lg text-sm font-medium">Concluir</button>
+      <div id="ckProfChips"></div>
+      <div id="ckProfEdit" class="hidden mt-2">
+        <div class="flex gap-2">
+          <select id="ckProfSel" class="f h-10 flex-1 text-sm"><option value="">Selecione para adicionar</option></select>
+          <button onclick="addProfCK()" class="h-10 px-3 bg-g-blueBg text-g-blue rounded-lg text-xs font-medium whitespace-nowrap">+ Add</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <div id="toastC" class="fixed bottom-6 left-4 right-4 z-[100] flex flex-col items-center pointer-events-none"></div>
+  <!-- Stepper -->
+  <div id="stepper" class="flex items-center gap-1 mb-4 overflow-x-auto tabs-scroll py-1"></div>
 
-  <script>
-    const SB_URL="https://vjykaegxqbpupkcvlnpo.supabase.co";
-    const SB_KEY="sb_publishable_bkvDYXXBk_OA9dWBSnK6lw_0DeOou9N";
-    const db=supabase.createClient(SB_URL,SB_KEY);
-    let REF=null,memberC=0,concluirId=null,medData=[],prodData=[],andData=[],tipoAtual='medido';
-    const VIEWS={novo:'vNovo',andamento:'vAndamento',concluidas:'vConcluidas',medicao:'vMedicao',producao:'vProducao',kpis:'vKpis'};
-    const TIPO_DESC={
-      medido:'Serviço medido por m² — entra na medição (faturamento) e na produção.',
-      diaria:'Diária de Sábado/Domingo/Feriado — valor fixo por profissional. Não entra na medição.',
-      tarefa:'Tarefa — valor combinado para concluir o serviço. Não entra na medição.',
-      reparo:'Reparo de serviço danificado pela obra — valor por unidade. Não entra na medição.'
-    };
+  <!-- Progress -->
+  <div class="mb-4">
+    <div class="flex justify-between text-xs text-g-secondary mb-1"><span id="progTxt">0 de 0</span><span id="progPct">0%</span></div>
+    <div class="prog"><div id="progBar" style="width:0%"></div></div>
+  </div>
 
-    function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-    function toast(m,t){const c=document.getElementById('toastC'),d=document.createElement('div');d.className='toast '+(t==='success'?'bg-g-green':'bg-g-red')+' text-white px-5 py-3 rounded-lg shadow-md2 flex items-center gap-3 text-sm font-medium pointer-events-auto mb-2 max-w-md';d.innerHTML='<span class="flex-shrink-0 w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">'+(t==='success'?'✓':'✕')+'</span><span>'+esc(m)+'</span>';c.appendChild(d);setTimeout(()=>d.remove(),3700);}
-    function fmtBR(n){return 'R$ '+Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
-    function fmtM2(n){return Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' m²';}
-    function fmtD(d){if(!d)return'-';d=String(d).split('T')[0];const p=d.split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:d;}
-    function parseDec(v){return v?parseFloat(String(v).replace(',','.')):NaN;}
+  <!-- Etapa atual -->
+  <div class="mb-3">
+    <p class="sl mb-1" id="etapaNome">Etapa</p>
+  </div>
+  <div id="ckItems" class="space-y-3"></div>
 
-    function go(tab){
-      Object.entries(VIEWS).forEach(([k,v])=>document.getElementById(v).classList.toggle('hidden',k!==tab));
-      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-      document.getElementById('tab-'+tab).classList.add('active');
-      window.scrollTo({top:0,behavior:'smooth'});
-      if(tab==='andamento')loadAndamento();
-      if(tab==='concluidas')loadConcluidas();
-      if(tab==='medicao')loadMedicao();
-      if(tab==='producao')loadProducao();
-      if(tab==='kpis')loadKpis();
-    }
+  <!-- Navegação entre etapas -->
+  <div class="flex gap-2 mt-5 mb-8">
+    <button onclick="prevEtapa()" id="btnPrev" class="flex-1 h-12 border border-g-border rounded-lg text-sm font-medium text-g-secondary disabled:opacity-40">← Etapa anterior</button>
+    <button onclick="nextEtapa()" id="btnNext" class="flex-1 h-12 bg-g-blue text-white rounded-lg text-sm font-medium">Próxima etapa →</button>
+  </div>
+</main>
 
-    // ===== TIPO DE LANÇAMENTO =====
-    function setTipo(tipo){
-      tipoAtual=tipo;
-      document.querySelectorAll('.tipo-btn').forEach(b=>b.classList.remove('active'));
-      document.getElementById('tp-'+tipo).classList.add('active');
-      document.getElementById('tipoDesc').textContent=TIPO_DESC[tipo];
-      // Serviço: oculto para diária
-      document.getElementById('fgS').style.display=(tipo==='diaria')?'none':'';
-      // Re-render team members for the new tipo
-      rebuildTeam();
-    }
+<!-- ===== REVIEW (antes de finalizar) ===== -->
+<main id="vReview" class="max-w-3xl mx-auto px-4 py-5 hidden">
+  <button onclick="backToChecklist()" class="text-sm text-g-blue font-medium mb-4 flex items-center gap-1">← Voltar ao checklist</button>
+  <h2 class="text-lg font-bold text-g-text mb-1">Revisão Final</h2>
+  <p class="text-sm text-g-secondary mb-4" id="reviewSummary"></p>
+  <div id="reviewList" class="space-y-2 mb-4"></div>
+  <div id="ncSection" class="hidden">
+    <p class="sl">Não-conformidades (reprovados)</p>
+    <div id="ncList" class="space-y-3 mb-3"></div>
+  </div>
+  <button onclick="finalizeFVS()" id="btnFinalize" class="w-full h-12 bg-g-green text-white font-medium text-sm rounded-lg shadow-md1 mt-2 mb-8">Finalizar e Salvar</button>
+</main>
 
-    // ===== INIT =====
-    document.addEventListener('DOMContentLoaded',async function(){
-      const s=localStorage.getItem('bronx_os_resp');if(s)document.getElementById('resp').value=s;
-      document.getElementById('dtIni').value=new Date().toISOString().split('T')[0];
-      try{
-        const r=await fetch('ref_os.json');REF=await r.json();
-        const obraSel=document.getElementById('obra');
-        REF.obras.forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;obraSel.appendChild(op);});
-      }catch(e){toast('Erro ao carregar dados de referência','error');console.error(e);}
-      try{
-        const {error}=await db.from('atividades').select('id',{count:'exact',head:true});
-        if(error)throw error;
-        document.getElementById('connStatus').innerHTML='<div class="w-2 h-2 rounded-full bg-g-green"></div><span class="text-xs font-medium text-g-green">Online</span>';
-        loadAndamento();
-      }catch(e){
-        document.getElementById('connStatus').innerHTML='<div class="w-2 h-2 rounded-full bg-g-red"></div><span class="text-xs font-medium text-g-red">Offline</span>';
-        console.error('Conn error:',e);
-      }
-      setTipo('medido');
-      addMember();
+<!-- ===== DETAIL (histórico) ===== -->
+<main id="vDetail" class="max-w-3xl mx-auto px-4 py-5 hidden">
+  <button onclick="goHome()" class="text-sm text-g-blue font-medium mb-4 flex items-center gap-1">← Voltar ao início</button>
+  <div id="detailContent"></div>
+</main>
+
+<!-- ===== MODAL ETAPA CONCLUÍDA ===== -->
+<div id="etapaModal" class="fixed inset-0 bg-black/40 z-[90] hidden items-center justify-center p-4">
+  <div class="bg-white rounded-lg shadow-md2 p-6 max-w-sm w-full">
+    <div class="w-12 h-12 rounded-full bg-g-greenBg flex items-center justify-center text-2xl mx-auto mb-3">✓</div>
+    <p class="text-sm text-g-text text-center mb-1" id="etapaModalInfo"></p>
+    <p class="text-xs text-g-hint text-center mb-5">O que deseja fazer agora?</p>
+    <div class="space-y-2">
+      <button onclick="modalIrProxima()" class="w-full h-12 bg-g-blue text-white rounded-lg text-sm font-medium" id="etapaModalProx">Próxima etapa →</button>
+      <button onclick="modalVoltarInicio()" class="w-full h-12 border border-g-border text-g-secondary rounded-lg text-sm font-medium">← Voltar ao início</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastC" class="fixed bottom-6 left-4 right-4 z-[100] flex flex-col items-center pointer-events-none"></div>
+
+<script>
+const SB_URL="https://vjykaegxqbpupkcvlnpo.supabase.co";
+const SB_KEY="sb_publishable_bkvDYXXBk_OA9dWBSnK6lw_0DeOou9N";
+const db=supabase.createClient(SB_URL,SB_KEY);
+let REF=null,fvs=null,allFvs=[],dashFilter='andamento',profEditOpen=false,savingFlag=false;
+
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function toast(m,t){const c=document.getElementById('toastC'),d=document.createElement('div');d.className='toast '+(t==='success'?'bg-g-green':t==='error'?'bg-g-red':'bg-g-text')+' text-white px-5 py-3 rounded-lg shadow-md2 flex items-center gap-3 text-sm font-medium pointer-events-auto mb-2 max-w-md';d.innerHTML='<span class="flex-shrink-0 w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">'+(t==='success'?'✓':t==='error'?'✕':'i')+'</span><span>'+esc(m)+'</span>';c.appendChild(d);setTimeout(()=>d.remove(),3700);}
+function fmtD(d){if(!d)return'-';d=String(d).split('T')[0];const p=d.split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:d;}
+const VIEWS=['vDash','vSvc','vIdent','vCK','vReview','vDetail'];
+function show(v){VIEWS.forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==v));window.scrollTo({top:0,behavior:'smooth'});}
+function goHome(){fvs=null;show('vDash');loadDash();}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded',async function(){
+  const s=localStorage.getItem('bronx_fvs_resp');if(s)document.getElementById('resp').value=s;
+  document.getElementById('dtAb').value=new Date().toISOString().split('T')[0];
+  try{
+    const r=await fetch('ref_fvs.json');REF=await r.json();
+    const obraSel=document.getElementById('obra');
+    REF.obras.forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;obraSel.appendChild(op);});
+    [document.getElementById('profSel'),document.getElementById('ckProfSel')].forEach(sel=>{
+      REF.colaboradores.forEach(c=>{const op=document.createElement('option');op.value=c;op.textContent=c;sel.appendChild(op);});
     });
+  }catch(e){toast('Erro ao carregar referência','error');console.error(e);}
+  try{
+    const {error}=await db.from('fvs').select('id',{count:'exact',head:true});
+    if(error)throw error;
+    document.getElementById('connStatus').innerHTML='<div class="w-2 h-2 rounded-full bg-g-green"></div><span class="text-xs font-medium text-g-green">Online</span>';
+  }catch(e){
+    document.getElementById('connStatus').innerHTML='<div class="w-2 h-2 rounded-full bg-g-red"></div><span class="text-xs font-medium text-g-red">Offline</span>';
+    console.error('Conn:',e);
+  }
+  loadDash();
+});
 
-    // ===== CASCADE: Obra -> Pavimento (ordem construtiva) =====
-    document.getElementById('obra').addEventListener('change',function(){
-      const sp=document.getElementById('pav');sp.innerHTML='<option value="">Selecione o pavimento</option>';
-      document.getElementById('svc').innerHTML='<option value="">Selecione o serviço</option>';
-      // Mostra encarregado da obra (implícito)
-      const encBadge=document.getElementById('encBadge');
-      const enc=(REF.encarregados&&REF.encarregados[this.value])||null;
-      if(enc){encBadge.innerHTML='👷 Encarregado: <b>'+esc(enc[0])+'</b> · Coord.: <b>'+esc(enc[1])+'</b>';encBadge.classList.remove('hidden');}
-      else{encBadge.classList.add('hidden');}
-      if(!this.value){document.getElementById('fgP').classList.add('disabled');return;}
-      document.getElementById('fgP').classList.remove('disabled');
-      (REF.pavimentos[this.value]||[]).forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;sp.appendChild(o);});
+// ===== CASCADE obra -> encarregado + pavimentos =====
+document.getElementById('obra').addEventListener('change',function(){
+  const sp=document.getElementById('pav');sp.innerHTML='<option value="">Selecione o pavimento</option>';
+  const enc=(REF.encarregados&&REF.encarregados[this.value])||null;
+  const badge=document.getElementById('encBadge');
+  if(enc){badge.innerHTML='👷 Encarregado: <b>'+esc(enc[0])+'</b> · Coord.: <b>'+esc(enc[1])+'</b>';badge.classList.remove('hidden');}
+  else badge.classList.add('hidden');
+  if(!this.value){document.getElementById('fgP').classList.add('disabled');return;}
+  document.getElementById('fgP').classList.remove('disabled');
+  (REF.pavimentos[this.value]||[]).forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;sp.appendChild(o);});
+});
+
+// ===== PROFISSIONAIS (identificação) =====
+let profList=[];
+function addProf(){const sel=document.getElementById('profSel');const v=sel.value;if(!v||profList.includes(v))return;profList.push(v);sel.value='';renderProfChips();}
+function rmProf(n){profList=profList.filter(p=>p!==n);renderProfChips();}
+function renderProfChips(){
+  document.getElementById('profChips').innerHTML=profList.map(p=>'<span class="chip">'+esc(p)+'<button onclick="rmProf(\''+esc(p).replace(/'/g,"")+'\')">✕</button></span>').join('');
+}
+
+// ===== DASHBOARD =====
+function dashTab(t){dashFilter=t;document.querySelectorAll('[id^="dt-"]').forEach(b=>b.classList.remove('active'));document.getElementById('dt-'+t).classList.add('active');renderDash();}
+async function loadDash(){
+  document.getElementById('dashLoad').classList.remove('hidden');
+  document.getElementById('dashList').innerHTML='';document.getElementById('dashEmpty').classList.add('hidden');
+  try{
+    const {data,error}=await db.from('fvs').select('*, fvs_itens(resultado,is_revistoria)').order('created_at',{ascending:false});
+    if(error)throw error;allFvs=data||[];
+    const nA=allFvs.filter(f=>f.status==='em_andamento').length;
+    const nR=allFvs.filter(f=>f.status==='revistoria').length;
+    document.getElementById('cAnd').textContent=nA;document.getElementById('cRev').textContent=nR;
+  }catch(e){console.error(e);allFvs=[];}
+  document.getElementById('dashLoad').classList.add('hidden');renderDash();
+}
+function fvsStats(f){
+  const its=(f.fvs_itens||[]);let ap=0,rp=0,co=0;
+  its.forEach(i=>{const r=String(i.resultado||'').toLowerCase();if(r==='aprovado')ap++;else if(r==='reprovado')rp++;else if(r.indexOf('corrig')>-1||r.indexOf('correç')>-1)co++;});
+  return {ap,rp,co,total:its.length};
+}
+function renderDash(){
+  const list=document.getElementById('dashList');list.innerHTML='';
+  let d=allFvs;
+  if(dashFilter==='andamento')d=allFvs.filter(f=>f.status==='em_andamento');
+  else if(dashFilter==='revistoria')d=allFvs.filter(f=>f.status==='revistoria');
+  else d=allFvs.filter(f=>f.status==='concluida');
+  if(!d.length){document.getElementById('dashEmpty').classList.remove('hidden');return;}
+  document.getElementById('dashEmpty').classList.add('hidden');
+  d.forEach((f,i)=>{
+    const s=fvsStats(f);
+    const stColors={em_andamento:'bg-g-blueBg text-g-blue',revistoria:'bg-g-amberBg text-g-amber',concluida:'bg-g-greenBg text-g-green'};
+    const stLabel={em_andamento:'Em Andamento',revistoria:'Revistoria',concluida:'Concluída'};
+    const profs=(f.profissionais||[]).join(', ')||'-';
+    const card=document.createElement('div');card.className='bg-white rounded-lg shadow-md1 p-4 su card';card.style.animationDelay=(i*.03)+'s';
+    let actions='';
+    if(f.status==='em_andamento'||f.status==='revistoria'){
+      actions='<button onclick="continuarFVS('+f.id+')" class="h-9 px-3 bg-g-blue text-white text-xs font-medium rounded-lg">Continuar</button>';
+    }else{
+      actions='<button onclick="verDetalhe('+f.id+')" class="h-9 px-3 bg-g-bg text-g-secondary text-xs font-medium rounded-lg border border-g-border">Ver</button>';
+    }
+    card.innerHTML='<div class="flex items-center gap-2 mb-2"><span class="text-xs font-medium px-2 py-0.5 rounded-full '+stColors[f.status]+'">'+stLabel[f.status]+'</span><span class="text-xs text-g-hint">'+esc(f.fvs_codigo)+'</span></div>'+
+      '<div class="flex items-start justify-between gap-3"><div class="min-w-0 flex-1">'+
+      '<h3 class="text-sm font-bold text-g-text">'+esc(f.servico)+'</h3>'+
+      '<p class="text-xs text-g-secondary mt-0.5">'+esc(f.obra)+' · '+esc(f.pavimento||'')+' · '+esc(f.ambiente||'')+'</p>'+
+      '<p class="text-xs text-g-hint mt-1">👷 '+esc(f.encarregado||'-')+' · 🔧 '+esc(profs)+'</p>'+
+      '<p class="text-xs text-g-hint">Por: '+esc(f.preenchido_por||'-')+' · '+fmtD(f.data_abertura)+'</p>'+
+      '<div class="flex gap-2 mt-2 text-xs font-medium">'+(s.ap?'<span class="text-g-green">'+s.ap+' aprov.</span>':'')+(s.co?'<span class="text-g-amber">'+s.co+' corrig.</span>':'')+(s.rp?'<span class="text-g-red">'+s.rp+' reprov.</span>':'')+'</div>'+
+      '</div><div class="flex flex-col gap-2 flex-shrink-0">'+actions+
+      (f.status!=='concluida'?'<button onclick="excluirFVS('+f.id+',\''+esc(f.fvs_codigo).replace(/'/g,"")+'\')" class="h-9 px-3 bg-g-redBg text-g-red text-xs font-medium rounded-lg">Excluir</button>':'')+
+      '</div></div>';
+    list.appendChild(card);
+  });
+}
+
+async function excluirFVS(id,cod){
+  if(!confirm('Excluir a FVS "'+cod+'"?\n\nRemove a verificação e todos os itens. Use para corrigir erros.'))return;
+  try{const {error}=await db.from('fvs').delete().eq('id',id);if(error)throw error;toast('FVS excluída.','success');loadDash();}
+  catch(e){toast('Erro ao excluir: '+(e.message||e),'error');console.error(e);}
+}
+
+// ===== NOVA FVS: seleção de serviço com cards =====
+const SVC_ICONS={'Argamassa Polimérica':['🧪','bg-g-blueBg'],'Manta Asfáltica':['🔥','bg-g-amberBg'],'Membrana Acrílica':['💧','bg-g-greenBg'],'Manta PEAD':['🛡','bg-g-redBg']};
+let selectedSvc=null;
+function startNew(){
+  renderSvcCards();
+  show('vSvc');
+}
+function renderSvcCards(){
+  const wrap=document.getElementById('svcCards');wrap.innerHTML='';
+  Object.keys(REF.checklists).forEach((svc,i)=>{
+    const ck=REF.checklists[svc];
+    const tot=ck.etapas.reduce((s,e)=>s+e.itens.length,0);
+    const ic=SVC_ICONS[svc]||['📋','bg-g-bg'];
+    const c=document.createElement('button');c.className='w-full bg-white rounded-lg shadow-md1 p-4 text-left card su';c.style.animationDelay=(i*.04)+'s';
+    c.onclick=()=>selSvc(svc);
+    c.innerHTML='<div class="flex items-center gap-3"><div class="w-12 h-12 rounded-lg '+ic[1]+' flex items-center justify-center text-2xl flex-shrink-0">'+ic[0]+'</div><div class="flex-1 min-w-0"><h3 class="text-sm font-bold text-g-text">'+esc(svc)+'</h3><p class="text-xs text-g-hint mt-1">'+ck.etapas.length+' etapas · '+tot+' itens de verificação</p></div><span class="text-g-blue text-xl">→</span></div>';
+    wrap.appendChild(c);
+  });
+}
+function selSvc(svc){
+  selectedSvc=svc;
+  profList=[];renderProfChips();
+  document.getElementById('obra').value='';document.getElementById('pav').innerHTML='<option value="">Selecione o pavimento</option>';
+  document.getElementById('fgP').classList.add('disabled');document.getElementById('encBadge').classList.add('hidden');
+  document.getElementById('amb').value='';
+  document.getElementById('dtAb').value=new Date().toISOString().split('T')[0];
+  const ic=SVC_ICONS[svc]||['📋','bg-g-bg'];
+  document.getElementById('identSvcIcon').textContent=ic[0];
+  document.getElementById('identSvcName').textContent=svc;
+  show('vIdent');
+}
+
+async function createFVS(){
+  document.querySelectorAll('.error').forEach(e=>e.classList.remove('error'));
+  if(!document.getElementById('resp').value.trim()){toast('Preencha "Preenchido por"','error');return;}
+  if(!selectedSvc){toast('Selecione o serviço','error');show('vSvc');return;}
+  let ok=true,first=null;
+  ['obra','pav','amb','dtAb'].forEach(id=>{const el=document.getElementById(id);if(!el.value.trim()){el.classList.add('error');if(!first)first=el;ok=false;}});
+  if(!ok){if(first)first.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  const obra=document.getElementById('obra').value;
+  const enc=(REF.encarregados&&REF.encarregados[obra])||[null,null];
+  const btn=document.getElementById('btnCreate');if(savingFlag)return;savingFlag=true;btn.classList.add('bl');btn.disabled=true;
+  try{
+    const codigo='FVS-'+Date.now().toString().slice(-8);
+    const {data,error}=await db.from('fvs').insert({
+      fvs_codigo:codigo,obra:obra,pavimento:document.getElementById('pav').value,
+      ambiente:document.getElementById('amb').value.trim(),servico:selectedSvc,
+      encarregado:enc[0],coordenador:enc[1],profissionais:profList,
+      preenchido_por:document.getElementById('resp').value.trim(),
+      data_abertura:document.getElementById('dtAb').value,etapa_atual:0,status:'em_andamento'
+    }).select().single();
+    if(error)throw error;
+    // create checklist items from template
+    const ck=REF.checklists[data.servico];
+    const itens=[];
+    ck.etapas.forEach(et=>{et.itens.forEach((crit,idx)=>{itens.push({fvs_id:data.id,etapa:et.nome,numero:idx+1,criterio:crit,resultado:null,is_revistoria:false});});});
+    const {error:e2}=await db.from('fvs_itens').insert(itens);
+    if(e2)throw e2;
+    toast('FVS '+codigo+' criada!','success');
+    await openFVS(data.id);
+  }catch(e){toast('Erro: '+(e.message||e),'error');console.error(e);}
+  finally{savingFlag=false;btn.classList.remove('bl');btn.disabled=false;}
+}
+
+// ===== ABRIR / CONTINUAR FVS =====
+async function continuarFVS(id){await openFVS(id);}
+async function openFVS(id){
+  try{
+    const {data,error}=await db.from('fvs').select('*, fvs_itens(*)').eq('id',id).single();
+    if(error)throw error;
+    fvs=data;
+    fvs.fvs_itens.sort((a,b)=>{if(a.is_revistoria!==b.is_revistoria)return a.is_revistoria?1:-1;return a.id-b.id;});
+    fvs.etapasList=REF.checklists[fvs.servico].etapas.map(e=>e.nome);
+    fvs.curEtapa=Math.min(fvs.etapa_atual||0,fvs.etapasList.length-1);
+    profEditOpen=false;
+    if(fvs.status==='revistoria'){
+      // Revistoria: mostra só os reprovados para reavaliar
+      renderRevistoria();
+      show('vCK');
+    }else{
+      renderCK();
+      show('vCK');
+    }
+  }catch(e){toast('Erro ao abrir FVS: '+(e.message||e),'error');console.error(e);}
+}
+
+// ===== REVISTORIA (reavaliar reprovados) =====
+function renderRevistoria(){
+  document.getElementById('ckCode').textContent=fvs.fvs_codigo+' · REVISTORIA';
+  document.getElementById('ckSvc').textContent=fvs.servico;
+  document.getElementById('ckLoc').textContent=fvs.obra+' · '+(fvs.pavimento||'')+' · '+(fvs.ambiente||'');
+  renderCKProfs();
+  document.getElementById('stepper').innerHTML='<span class="text-xs text-g-amber font-medium">Reavaliação dos itens reprovados</span>';
+  const reprovados=fvs.fvs_itens.filter(it=>it.resultado==='Reprovado'&&!it.is_revistoria);
+  const all=fvs.fvs_itens.filter(it=>!it.is_revistoria);
+  const corrigidos=all.filter(it=>it.resultado==='Corrigido'||it.resultado==='Aprovado').length;
+  document.getElementById('progTxt').textContent=reprovados.length+' reprovado(s) a reavaliar';
+  document.getElementById('progPct').textContent='';
+  document.getElementById('progBar').style.width=(all.length?corrigidos/all.length*100:0)+'%';
+  document.getElementById('etapaNome').textContent='Itens reprovados — marque como Corrigido após o reparo';
+  const wrap=document.getElementById('ckItems');wrap.innerHTML='';
+  if(!reprovados.length){wrap.innerHTML='<p class="text-sm text-g-hint text-center py-4">Nenhum item reprovado pendente.</p>';}
+  reprovados.forEach(it=>{
+    const card=document.createElement('div');card.className='bg-white rounded-lg shadow-md1 p-4 su border-l-4 border-g-red';
+    const r=it.resultado||'';
+    card.innerHTML='<p class="text-sm text-g-text mb-1">'+esc(it.criterio)+'</p>'+(it.observacao?'<p class="text-xs text-g-hint mb-3">Tratamento: '+esc(it.observacao)+'</p>':'<div class="mb-3"></div>')+
+      '<div class="flex gap-2">'+
+      '<button class="opt corrigido'+(r==='Corrigido'?' sel':'')+'" onclick="setRevRes('+it.id+',\'Corrigido\')">Corrigido</button>'+
+      '<button class="opt reprovado'+(r==='Reprovado'?' sel':'')+'" onclick="setRevRes('+it.id+',\'Reprovado\')">Continua Reprovado</button>'+
+      '</div>';
+    wrap.appendChild(card);
+  });
+  // Nav buttons -> finalize revistoria
+  document.getElementById('btnPrev').style.display='none';
+  document.getElementById('btnNext').textContent='Finalizar Revistoria';
+  document.getElementById('btnNext').onclick=finalizeRevistoria;
+}
+function setRevRes(itemId,res){
+  const it=fvs.fvs_itens.find(x=>x.id===itemId);if(!it)return;
+  it.resultado=res;if(res==='Corrigido')it.data_final=new Date().toISOString().split('T')[0];
+  renderRevistoria();
+  db.from('fvs_itens').update({resultado:res,data_final:it.data_final}).eq('id',itemId);
+}
+async function finalizeRevistoria(){
+  const aindaReprovado=fvs.fvs_itens.some(it=>it.resultado==='Reprovado'&&!it.is_revistoria);
+  const btn=document.getElementById('btnNext');if(savingFlag)return;savingFlag=true;btn.classList.add('bl');
+  try{
+    if(aindaReprovado){
+      toast('Ainda há itens reprovados. Corrija para concluir.','error');
+      savingFlag=false;btn.classList.remove('bl');return;
+    }
+    await db.from('fvs').update({status:'concluida',updated_at:new Date().toISOString()}).eq('id',fvs.id);
+    // reset nav button handler
+    document.getElementById('btnNext').onclick=nextEtapa;document.getElementById('btnPrev').style.display='';
+    toast('Revistoria concluída! FVS finalizada.','success');
+    goHome();
+  }catch(e){toast('Erro: '+(e.message||e),'error');console.error(e);}
+  finally{savingFlag=false;btn.classList.remove('bl');}
+}
+
+// ===== RENDER CHECKLIST =====
+function renderCK(){
+  document.getElementById('btnNext').onclick=nextEtapa;
+  document.getElementById('btnPrev').style.display='';
+  document.getElementById('progPct').style.display='';
+  document.getElementById('ckCode').textContent=fvs.fvs_codigo;
+  document.getElementById('ckSvc').textContent=fvs.servico;
+  document.getElementById('ckLoc').textContent=fvs.obra+' · '+(fvs.pavimento||'')+' · '+(fvs.ambiente||'')+' · 👷 '+(fvs.encarregado||'-');
+  renderCKProfs();
+  renderStepper();
+  renderEtapaItems();
+  updateProgress();
+  updateNavButtons();
+}
+function renderCKProfs(){
+  document.getElementById('ckProfChips').innerHTML=(fvs.profissionais||[]).map(p=>'<span class="chip">'+esc(p)+(profEditOpen?'<button onclick="rmProfCK(\''+esc(p).replace(/'/g,"")+'\')">✕</button>':'')+'</span>').join('')||'<span class="text-xs text-g-hint">Nenhum profissional</span>';
+}
+function toggleProfEdit(){profEditOpen=!profEditOpen;document.getElementById('ckProfEdit').classList.toggle('hidden',!profEditOpen);document.getElementById('profEditBtn').textContent=profEditOpen?'Concluir':'Editar';renderCKProfs();}
+async function addProfCK(){
+  const sel=document.getElementById('ckProfSel');const v=sel.value;if(!v||(fvs.profissionais||[]).includes(v))return;
+  fvs.profissionais=[...(fvs.profissionais||[]),v];sel.value='';
+  await db.from('fvs').update({profissionais:fvs.profissionais,updated_at:new Date().toISOString()}).eq('id',fvs.id);
+  renderCKProfs();
+}
+async function rmProfCK(n){
+  fvs.profissionais=(fvs.profissionais||[]).filter(p=>p!==n);
+  await db.from('fvs').update({profissionais:fvs.profissionais,updated_at:new Date().toISOString()}).eq('id',fvs.id);
+  renderCKProfs();
+}
+function renderStepper(){
+  const wrap=document.getElementById('stepper');wrap.innerHTML='';
+  fvs.etapasList.forEach((nome,i)=>{
+    const cls=i<fvs.curEtapa?'done':i===fvs.curEtapa?'cur':'todo';
+    const dot=document.createElement('div');dot.className='flex items-center gap-1 flex-shrink-0';
+    dot.innerHTML='<div class="stepdot '+cls+'" onclick="jumpEtapa('+i+')" style="cursor:pointer">'+(i<fvs.curEtapa?'✓':(i+1))+'</div>'+(i<fvs.etapasList.length-1?'<div class="w-4 h-px bg-g-border"></div>':'');
+    wrap.appendChild(dot);
+  });
+}
+function jumpEtapa(i){saveCurrentEtapa();fvs.curEtapa=i;renderCK();}
+function etapaItems(etapaNome){return fvs.fvs_itens.filter(it=>it.etapa===etapaNome&&!it.is_revistoria);}
+function renderEtapaItems(){
+  const nome=fvs.etapasList[fvs.curEtapa];
+  document.getElementById('etapaNome').textContent='Etapa '+(fvs.curEtapa+1)+' de '+fvs.etapasList.length+' — '+nome;
+  const items=etapaItems(nome);
+  const wrap=document.getElementById('ckItems');wrap.innerHTML='';
+  items.forEach((it)=>{
+    const card=document.createElement('div');card.className='bg-white rounded-lg shadow-md1 p-4 su';
+    const r=it.resultado||'';
+    card.innerHTML='<p class="text-sm text-g-text mb-3">'+esc(it.criterio)+'</p>'+
+      '<div class="flex gap-2 mb-2">'+
+      '<button class="opt aprovado'+(r==='Aprovado'?' sel':'')+'" onclick="setRes('+it.id+',\'Aprovado\')">Aprovado</button>'+
+      '<button class="opt reprovado'+(r==='Reprovado'?' sel':'')+'" onclick="setRes('+it.id+',\'Reprovado\')">Reprovado</button>'+
+      '</div><div class="flex gap-2">'+
+      '<button class="opt corrigido'+(r==='Corrigido'?' sel':'')+'" onclick="setRes('+it.id+',\'Corrigido\')">Corrigido</button>'+
+      '<button class="opt na'+(r==='N/A'?' sel':'')+'" onclick="setRes('+it.id+',\'N/A\')">N/A</button>'+
+      '</div>'+
+      '<input type="text" placeholder="Observação (opcional)" value="'+esc(it.observacao||'')+'" onchange="setObs('+it.id+',this.value)" class="f h-10 mt-3 text-sm">';
+    wrap.appendChild(card);
+  });
+}
+async function setRes(itemId,res){
+  const it=fvs.fvs_itens.find(x=>x.id===itemId);if(!it)return;
+  it.resultado=res;if(!it.data_1a)it.data_1a=new Date().toISOString().split('T')[0];
+  renderEtapaItems();updateProgress();
+  try{
+    const {error}=await db.from('fvs_itens').update({resultado:res,data_1a:it.data_1a}).eq('id',itemId);
+    if(error)throw error;
+  }catch(e){toast('Erro ao salvar item: '+(e.message||e),'error');console.error(e);}
+}
+async function setObs(itemId,v){
+  const it=fvs.fvs_itens.find(x=>x.id===itemId);if(!it)return;it.observacao=v;
+  try{const {error}=await db.from('fvs_itens').update({observacao:v}).eq('id',itemId);if(error)throw error;}
+  catch(e){toast('Erro ao salvar observação','error');console.error(e);}
+}
+function updateProgress(){
+  const all=fvs.fvs_itens.filter(it=>!it.is_revistoria);
+  const done=all.filter(it=>it.resultado).length;
+  const pct=all.length?Math.round(done/all.length*100):0;
+  document.getElementById('progTxt').textContent=done+' de '+all.length;
+  document.getElementById('progPct').textContent=pct+'%';
+  document.getElementById('progBar').style.width=pct+'%';
+}
+async function saveCurrentEtapa(){
+  try{
+    const {error}=await db.from('fvs').update({etapa_atual:fvs.curEtapa,updated_at:new Date().toISOString()}).eq('id',fvs.id);
+    if(error)throw error;
+  }catch(e){toast('Erro ao salvar progresso','error');console.error(e);}
+}
+
+// ===== NAVEGAÇÃO ENTRE ETAPAS =====
+function prevEtapa(){if(fvs.curEtapa>0){fvs.curEtapa--;saveCurrentEtapa();renderCK();}}
+async function nextEtapa(){
+  // validate current etapa fully answered
+  const nome=fvs.etapasList[fvs.curEtapa];
+  const items=etapaItems(nome);
+  const unanswered=items.filter(it=>!it.resultado);
+  if(unanswered.length>0){toast('Responda todos os '+items.length+' itens desta etapa ('+unanswered.length+' faltando)','error');return;}
+  await saveCurrentEtapa();
+  if(fvs.curEtapa<fvs.etapasList.length-1){
+    // mostra modal: voltar ao início ou próxima etapa
+    abrirEtapaModal(nome);
+  }else{
+    goReview();
+  }
+}
+function abrirEtapaModal(etapaConcluida){
+  const proxima=fvs.etapasList[fvs.curEtapa+1];
+  document.getElementById('etapaModalInfo').innerHTML='Etapa <b>'+esc(etapaConcluida)+'</b> concluída e salva. ✓';
+  document.getElementById('etapaModalProx').textContent='Ir para: '+proxima;
+  document.getElementById('etapaModal').classList.remove('hidden');
+  document.getElementById('etapaModal').classList.add('flex');
+}
+function fecharEtapaModal(){document.getElementById('etapaModal').classList.add('hidden');document.getElementById('etapaModal').classList.remove('flex');}
+function modalIrProxima(){fecharEtapaModal();fvs.curEtapa++;saveCurrentEtapa();renderCK();}
+function modalVoltarInicio(){fecharEtapaModal();goHome();}
+function updateNavButtons(){
+  document.getElementById('btnPrev').disabled=fvs.curEtapa===0;
+  document.getElementById('btnNext').textContent=fvs.curEtapa<fvs.etapasList.length-1?'Próxima etapa →':'Revisar e finalizar →';
+}
+
+// ===== REVIEW =====
+function backToChecklist(){show('vCK');renderCK();}
+function goReview(){
+  const all=fvs.fvs_itens.filter(it=>!it.is_revistoria);
+  let ap=0,rp=0,co=0,na=0;
+  all.forEach(it=>{if(it.resultado==='Aprovado')ap++;else if(it.resultado==='Reprovado')rp++;else if(it.resultado==='Corrigido')co++;else if(it.resultado==='N/A')na++;});
+  document.getElementById('reviewSummary').textContent=fvs.servico+' · '+fvs.obra+' · '+(fvs.ambiente||'');
+  const list=document.getElementById('reviewList');
+  list.innerHTML='<div class="bg-white rounded-lg shadow-md1 p-4 flex justify-around text-center">'+
+    '<div><p class="text-2xl font-bold text-g-green">'+ap+'</p><p class="text-xs text-g-hint">Aprovados</p></div>'+
+    '<div><p class="text-2xl font-bold text-g-amber">'+co+'</p><p class="text-xs text-g-hint">Corrigidos</p></div>'+
+    '<div><p class="text-2xl font-bold text-g-red">'+rp+'</p><p class="text-xs text-g-hint">Reprovados</p></div>'+
+    '<div><p class="text-2xl font-bold text-g-secondary">'+na+'</p><p class="text-xs text-g-hint">N/A</p></div></div>';
+  // NC section if reprovados
+  const reprovados=all.filter(it=>it.resultado==='Reprovado');
+  const ncSec=document.getElementById('ncSection');
+  if(reprovados.length>0){
+    ncSec.classList.remove('hidden');
+    document.getElementById('ncList').innerHTML=reprovados.map(it=>'<div class="bg-g-redBg rounded-lg p-3"><p class="text-xs font-medium text-g-red mb-1">'+esc(it.criterio)+'</p><input type="text" placeholder="Tratamento da não-conformidade" value="'+esc(it.observacao||'')+'" onchange="setObs('+it.id+',this.value)" class="f h-9 text-sm"></div>').join('');
+    document.getElementById('btnFinalize').textContent='Finalizar (haverá revistoria)';
+  }else{ncSec.classList.add('hidden');document.getElementById('btnFinalize').textContent='Finalizar e Salvar';}
+  show('vReview');
+}
+
+// ===== FINALIZE =====
+async function finalizeFVS(){
+  const all=fvs.fvs_itens.filter(it=>!it.is_revistoria);
+  const hasReprovado=all.some(it=>it.resultado==='Reprovado');
+  const btn=document.getElementById('btnFinalize');if(savingFlag)return;savingFlag=true;btn.classList.add('bl');btn.disabled=true;
+  try{
+    const novoStatus=hasReprovado?'revistoria':'concluida';
+    const {error}=await db.from('fvs').update({status:novoStatus,etapa_atual:fvs.etapasList.length,updated_at:new Date().toISOString()}).eq('id',fvs.id);
+    if(error)throw error;
+    // save NCs for reprovados
+    if(hasReprovado){
+      const ncs=all.filter(it=>it.resultado==='Reprovado').map(it=>({fvs_id:fvs.id,local:fvs.ambiente,descricao:it.criterio,tratamento:it.observacao||''}));
+      if(ncs.length)await db.from('fvs_ncs').insert(ncs);
+      toast('FVS finalizada. Há reprovados — foi para Revistoria.','info');
+    }else{
+      toast('FVS concluída com sucesso!','success');
+    }
+    goHome();
+  }catch(e){toast('Erro ao finalizar: '+(e.message||e),'error');console.error(e);}
+  finally{savingFlag=false;btn.classList.remove('bl');btn.disabled=false;}
+}
+
+// ===== DETALHE (histórico) =====
+async function verDetalhe(id){
+  try{
+    const {data,error}=await db.from('fvs').select('*, fvs_itens(*), fvs_ncs(*)').eq('id',id).single();
+    if(error)throw error;
+    const f=data;const its=(f.fvs_itens||[]).filter(i=>!i.is_revistoria).sort((a,b)=>a.id-b.id);
+    const byEtapa={};its.forEach(i=>{(byEtapa[i.etapa]=byEtapa[i.etapa]||[]).push(i);});
+    let h='<div class="bg-white rounded-lg shadow-md1 p-4 mb-4"><div class="flex items-center gap-2 mb-2"><span class="text-xs font-medium px-2 py-0.5 rounded-full bg-g-greenBg text-g-green">Concluída</span><span class="text-xs text-g-hint">'+esc(f.fvs_codigo)+'</span></div>';
+    h+='<h2 class="text-lg font-bold text-g-text">'+esc(f.servico)+'</h2><p class="text-xs text-g-secondary mt-1">'+esc(f.obra)+' · '+esc(f.pavimento||'')+' · '+esc(f.ambiente||'')+'</p>';
+    h+='<p class="text-xs text-g-hint mt-1">👷 '+esc(f.encarregado||'-')+' · Coord.: '+esc(f.coordenador||'-')+'</p>';
+    h+='<p class="text-xs text-g-hint">🔧 '+esc((f.profissionais||[]).join(', ')||'-')+'</p>';
+    h+='<p class="text-xs text-g-hint">Por: '+esc(f.preenchido_por||'-')+' · '+fmtD(f.data_abertura)+'</p></div>';
+    Object.entries(byEtapa).forEach(([et,items])=>{
+      h+='<div class="bg-white rounded-lg shadow-md1 p-4 mb-3"><p class="sl">'+esc(et)+'</p>';
+      items.forEach(it=>{
+        const rc={'Aprovado':'text-g-green','Reprovado':'text-g-red','Corrigido':'text-g-amber','N/A':'text-g-secondary'}[it.resultado]||'text-g-hint';
+        h+='<div class="flex items-start justify-between gap-2 py-2 border-t border-g-divider"><span class="text-xs text-g-text flex-1">'+esc(it.criterio)+(it.observacao?'<br><span class="text-g-hint">obs: '+esc(it.observacao)+'</span>':'')+'</span><span class="text-xs font-medium '+rc+' whitespace-nowrap">'+esc(it.resultado||'-')+'</span></div>';
+      });
+      h+='</div>';
     });
-
-    // ===== CASCADE: Pavimento -> Serviço (filtrado por local) =====
-    document.getElementById('pav').addEventListener('change',function(){
-      const svcSel=document.getElementById('svc');svcSel.innerHTML='<option value="">Selecione o serviço</option>';
-      const hint=document.getElementById('svcHint');
-      const obra=document.getElementById('obra').value;
-      if(!this.value){hint.classList.add('hidden');return;}
-      const previstos=REF.servicos_por_local[obra+'||'+this.value]||[];
-      if(previstos.length>0){
-        previstos.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;svcSel.appendChild(o);});
-        hint.textContent='✓ '+previstos.length+' serviço(s) previsto(s) no orçamento deste local';
-        hint.className='text-xs text-g-green mt-1';
-      }
-      // Always add all families as fallback (separator + full list)
-      const sep=document.createElement('option');sep.disabled=true;sep.textContent='─── Outros serviços ───';svcSel.appendChild(sep);
-      REF.familias.forEach(s=>{if(!previstos.includes(s)){const o=document.createElement('option');o.value=s;o.textContent=s;svcSel.appendChild(o);}});
-      if(previstos.length===0){hint.textContent='Nenhum serviço previsto no orçamento deste local — todos disponíveis';hint.className='text-xs text-g-amber mt-1';}
-      hint.classList.remove('hidden');
-    });
-
-    // ===== TEAM =====
-    function teamCount(){return document.querySelectorAll('[id^="m-"]').length;}
-    function updTeamCnt(){document.getElementById('teamCnt').textContent=teamCount()+' profissionais';}
-
-    function memberHTML(id){
-      const showM2=tipoAtual==='medido';
-      const showTit=tipoAtual==='medido';
-      const showReparo=tipoAtual==='reparo';
-      let valLabel,valField;
-      if(tipoAtual==='medido'){
-        valField='<div class="relative col-span-1"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-g-hint text-xs">m²</span><input type="text" id="area-'+id+'" inputmode="decimal" placeholder="0,00" class="f h-10 pl-7"></div>'+
-                 '<div class="relative col-span-1"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-g-hint text-xs">R$/m²</span><input type="text" id="prc-'+id+'" inputmode="decimal" placeholder="0,00" class="f h-10 pl-10"></div>';
-      }else if(tipoAtual==='reparo'){
-        valField='<div class="relative col-span-1"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-g-hint text-xs">Qtd</span><input type="text" id="qtd-'+id+'" inputmode="decimal" placeholder="0" class="f h-10 pl-9"></div>'+
-                 '<div class="relative col-span-1"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-g-hint text-xs">R$/un</span><input type="text" id="vfx-'+id+'" inputmode="decimal" placeholder="0,00" class="f h-10 pl-10"></div>';
-      }else{ // diaria, tarefa
-        const lbl=tipoAtual==='diaria'?'Valor da diária':'Valor da tarefa';
-        valField='<div class="relative col-span-2"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-g-hint text-xs">R$ '+lbl+'</span><input type="text" id="vfx-'+id+'" inputmode="decimal" placeholder="0,00" class="f h-10 pl-32"></div>';
-      }
-      return '<div class="flex items-center justify-between"><span class="text-xs font-medium text-g-secondary uppercase">Profissional '+(teamCount())+'</span>'+
-        '<div class="flex items-center gap-2">'+(showTit?'<button type="button" onclick="setTit('+id+')" id="tit-'+id+'" class="text-xs font-medium px-3 py-1 rounded-full border border-g-border text-g-hint">Titular</button>':'')+
-        '<button type="button" onclick="rmMember('+id+')" class="text-g-hint hover:text-g-red text-lg leading-none px-1">✕</button></div></div>'+
-        '<select id="col-'+id+'" class="f h-10"><option value="">Selecione</option></select>'+
-        '<div class="grid grid-cols-3 gap-2">'+
-        '<select id="fun-'+id+'" class="f h-10 col-span-1"><option value="Profissional">Profissional</option><option value="Meio Oficial">Meio Oficial</option><option value="Ajudante">Ajudante</option></select>'+
-        valField+'</div>';
+    if((f.fvs_ncs||[]).length){
+      h+='<div class="bg-white rounded-lg shadow-md1 p-4 mb-3"><p class="sl">Não-conformidades</p>';
+      f.fvs_ncs.forEach(nc=>{h+='<div class="bg-g-redBg rounded-lg p-3 mt-2"><p class="text-xs font-medium text-g-red">'+esc(nc.descricao)+'</p>'+(nc.tratamento?'<p class="text-xs text-g-secondary mt-1">Tratamento: '+esc(nc.tratamento)+'</p>':'')+'</div>';});
+      h+='</div>';
     }
-
-    function addMember(){
-      memberC++;const id=memberC;
-      const card=document.createElement('div');card.className='bg-g-bg rounded-lg p-3 space-y-2 border border-g-border su';card.id='m-'+id;
-      card.innerHTML=memberHTML(id);
-      document.getElementById('teamList').appendChild(card);
-      const sel=document.getElementById('col-'+id);REF.colaboradores.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});
-      if(teamCount()===1&&tipoAtual==='medido')setTit(id);
-      updTeamCnt();
-    }
-
-    function rebuildTeam(){
-      // Preserve selected colaboradores, rebuild fields for new tipo
-      const prev=[];
-      document.querySelectorAll('[id^="m-"]').forEach(card=>{const id=card.id.replace('m-','');prev.push(document.getElementById('col-'+id)?.value||'');});
-      document.getElementById('teamList').innerHTML='';memberC=0;
-      if(prev.length===0)prev.push('');
-      prev.forEach(col=>{addMember();const id=memberC;if(col)document.getElementById('col-'+id).value=col;});
-      if(tipoAtual==='medido'){const f=document.querySelector('[id^="m-"]');if(f)setTit(parseInt(f.id.replace('m-','')));}
-    }
-
-    function rmMember(id){const el=document.getElementById('m-'+id);const titBtn=document.getElementById('tit-'+id);const wasTit=titBtn&&titBtn.classList.contains('bg-g-blue');el.remove();if(wasTit){const f=document.querySelector('[id^="m-"]');if(f)setTit(parseInt(f.id.replace('m-','')));}updTeamCnt();}
-    function setTit(id){document.querySelectorAll('[id^="tit-"]').forEach(b=>{b.classList.remove('bg-g-blue','text-white','border-g-blue');b.classList.add('text-g-hint','border-g-border');});const b=document.getElementById('tit-'+id);if(b){b.classList.add('bg-g-blue','text-white','border-g-blue');b.classList.remove('text-g-hint','border-g-border');}}
-
-    function getTeam(){
-      const team=[];
-      document.querySelectorAll('[id^="m-"]').forEach(card=>{
-        const id=card.id.replace('m-','');
-        const m={colaborador:document.getElementById('col-'+id).value,funcao:document.getElementById('fun-'+id).value,tipo:tipoAtual};
-        if(tipoAtual==='medido'){
-          m.area=parseDec(document.getElementById('area-'+id).value);
-          m.preco=parseDec(document.getElementById('prc-'+id).value);
-          const tb=document.getElementById('tit-'+id);m.titular=tb&&tb.classList.contains('bg-g-blue');
-        }else if(tipoAtual==='reparo'){
-          m.qtd=parseDec(document.getElementById('qtd-'+id).value);
-          m.valorFixo=parseDec(document.getElementById('vfx-'+id).value);
-        }else{
-          m.valorFixo=parseDec(document.getElementById('vfx-'+id).value);
-        }
-        team.push(m);
-      });
-      return team;
-    }
-
-    // ===== SAVE =====
-    let salvando=false;
-    async function salvarFrente(){
-      if(salvando)return; // proteção contra duplo envio
-      document.querySelectorAll('.error').forEach(e=>e.classList.remove('error'));
-      if(!document.getElementById('resp').value.trim()){toast('Preencha "Preenchido por"','error');return;}
-      let ok=true,first=null;
-      function err(el){el.classList.add('error');if(!first)first=el;ok=false;}
-      const needSvc=tipoAtual!=='diaria';
-      const reqFields=['obra','pav','amb','dtIni'];if(needSvc)reqFields.push('svc');
-      reqFields.forEach(id=>{const el=document.getElementById(id);if(!el.value.trim())err(el);});
-      const team=getTeam();
-      if(team.length===0){toast('Adicione ao menos 1 profissional','error');return;}
-      let hasTit=tipoAtual!=='medido';
-      for(const m of team){
-        if(!m.colaborador){toast('Selecione todos os profissionais','error');ok=false;break;}
-        if(tipoAtual==='medido'){if(isNaN(m.area)||m.area<0||isNaN(m.preco)||m.preco<0){toast('Complete área e preço de todos','error');ok=false;break;}if(m.titular)hasTit=true;}
-        else if(tipoAtual==='reparo'){if(isNaN(m.qtd)||m.qtd<=0||isNaN(m.valorFixo)||m.valorFixo<0){toast('Complete quantidade e valor do reparo','error');ok=false;break;}}
-        else{if(isNaN(m.valorFixo)||m.valorFixo<0){toast('Informe o valor de todos','error');ok=false;break;}}
-      }
-      if(tipoAtual==='medido'&&!hasTit){toast('Defina um profissional como Titular','error');return;}
-      if(!ok){if(first)first.scrollIntoView({behavior:'smooth',block:'center'});return;}
-
-      const btn=document.getElementById('btnSalvar');salvando=true;btn.classList.add('bl');btn.disabled=true;
-      try{
-        const svcVal=needSvc?document.getElementById('svc').value:({diaria:'Diária (Sábado/Domingo/Feriado)'}[tipoAtual]||tipoAtual);
-        const obraSel=document.getElementById('obra').value;
-        const encInfo=(REF.encarregados&&REF.encarregados[obraSel])||null;
-        const {data:atv,error:e1}=await db.from('atividades').insert({
-          obra:obraSel,pavimento:document.getElementById('pav').value,
-          ambiente:document.getElementById('amb').value.trim(),servico:svcVal,
-          data_inicio:document.getElementById('dtIni').value,observacoes:document.getElementById('obs').value.trim(),
-          encarregado:encInfo?encInfo[0]:null,coordenador:encInfo?encInfo[1]:null,
-          criado_por:document.getElementById('resp').value.trim()
-        }).select().single();
-        if(e1)throw e1;
-        const prods=team.map(m=>{
-          const base={atividade_id:atv.id,profissional:m.colaborador,funcao:m.funcao,tipo_remuneracao:m.tipo,titular:!!m.titular,area_m2:0,preco_unit:0};
-          if(m.tipo==='medido'){base.area_m2=m.area;base.preco_unit=m.preco;}
-          else if(m.tipo==='reparo'){base.quantidade=m.qtd;base.valor_fixo=m.valorFixo;}
-          else{base.valor_fixo=m.valorFixo;}
-          return base;
-        });
-        const {error:e2}=await db.from('producao').insert(prods);
-        if(e2)throw e2;
-        toast('Lançamento criado com '+team.length+' profissional(is)!','success');
-        document.getElementById('amb').value='';document.getElementById('obs').value='';document.getElementById('svc').value='';
-        document.getElementById('teamList').innerHTML='';memberC=0;addMember();
-      }catch(e){toast('Erro ao salvar: '+(e.message||e),'error');console.error(e);}
-      finally{salvando=false;btn.classList.remove('bl');btn.disabled=false;}
-    }
-
-    // ===== EM ANDAMENTO =====
-    async function loadAndamento(){
-      document.getElementById('andLoad').classList.remove('hidden');
-      document.getElementById('andList').innerHTML='';document.getElementById('andEmpty').classList.add('hidden');
-      try{
-        const {data,error}=await db.from('atividades').select('*, producao(*)').eq('status','em_andamento').order('created_at',{ascending:false});
-        if(error)throw error;andData=data||[];document.getElementById('cntAnd').textContent=andData.length;
-      }catch(e){console.error(e);andData=[];}
-      document.getElementById('andLoad').classList.add('hidden');renderAndamento();
-    }
-    function renderAndamento(){
-      const list=document.getElementById('andList');list.innerHTML='';
-      const meus=document.getElementById('filtroMeus').checked,myName=document.getElementById('resp').value.trim();
-      let d=andData;if(meus&&myName)d=d.filter(a=>a.criado_por===myName);
-      if(!d.length){document.getElementById('andEmpty').classList.remove('hidden');return;}
-      document.getElementById('andEmpty').classList.add('hidden');
-      d.forEach((a,i)=>{
-        const tit=(a.producao||[]).find(p=>p.titular)||((a.producao||[])[0]);
-        const area=tit&&tit.tipo_remuneracao==='medido'?tit.area_m2:0;
-        const tipos=[...new Set((a.producao||[]).map(p=>p.tipo_remuneracao))];
-        const tipoBadge=tipos.includes('medido')?'':'<span class="text-xs font-medium px-2 py-0.5 rounded-full bg-g-purpleBg text-g-purple ml-1">'+esc(tipos[0])+'</span>';
-        const card=document.createElement('div');card.className='bg-white rounded-lg shadow-md1 p-4 su card';card.style.animationDelay=(i*.03)+'s';
-        card.innerHTML='<div class="flex items-start justify-between gap-3"><div class="min-w-0 flex-1">'+
-          '<p class="text-sm font-bold text-g-text">'+esc(a.servico)+tipoBadge+'</p>'+
-          '<p class="text-xs text-g-secondary mt-0.5">'+esc(a.obra)+' · '+esc(a.pavimento)+' · '+esc(a.ambiente)+'</p>'+
-          '<p class="text-xs text-g-hint mt-1">Início: '+fmtD(a.data_inicio)+' · '+(a.producao||[]).length+' prof. '+(area?'· '+fmtM2(area):'')+'</p>'+
-          '<p class="text-xs text-g-hint">Por: '+esc(a.criado_por)+'</p></div>'+
-          '<div class="flex flex-col gap-2 flex-shrink-0">'+
-          '<button onclick="abrirConcluir(\''+a.id+'\',\''+esc(a.servico).replace(/'/g,"")+'\')" class="h-9 px-3 bg-g-greenBg text-g-green text-xs font-medium rounded-lg hover:bg-g-green hover:text-white transition-colors whitespace-nowrap">✓ Concluir</button>'+
-          '<button onclick="excluirFrente(\''+a.id+'\',\''+esc(a.servico).replace(/'/g,"")+'\')" class="h-9 px-3 bg-g-redBg text-g-red text-xs font-medium rounded-lg hover:bg-g-red hover:text-white transition-colors whitespace-nowrap">🗑 Excluir</button>'+
-          '</div></div>';
-        list.appendChild(card);
-      });
-    }
-
-    // ===== EXCLUIR =====
-    async function excluirFrente(id,svc){
-      if(!confirm('Excluir a frente "'+svc+'"?\n\nEsta ação é permanente e remove a frente e toda a produção vinculada. Use apenas para corrigir erros de lançamento.'))return;
-      try{
-        const {error}=await db.from('atividades').delete().eq('id',id);
-        if(error)throw error;
-        toast('Frente excluída.','success');loadAndamento();
-      }catch(e){toast('Erro ao excluir: '+(e.message||e),'error');console.error(e);}
-    }
-
-    // ===== CONCLUIR =====
-    let concluirDataIni=null;
-    function abrirConcluir(id,svc){
-      concluirId=id;
-      const atv=andData.find(a=>a.id===id);
-      concluirDataIni=atv?atv.data_inicio:null;
-      document.getElementById('modalInfo').textContent=svc+(concluirDataIni?' · Início: '+fmtD(concluirDataIni):'');
-      const dtFim=document.getElementById('dtFim');
-      dtFim.value=new Date().toISOString().split('T')[0];
-      if(concluirDataIni)dtFim.min=String(concluirDataIni).split('T')[0];
-      document.getElementById('modalConcluir').classList.remove('hidden');document.getElementById('modalConcluir').classList.add('flex');
-    }
-    function fecharModal(){document.getElementById('modalConcluir').classList.add('hidden');document.getElementById('modalConcluir').classList.remove('flex');concluirId=null;}
-    async function confirmarConclusao(){
-      const dt=document.getElementById('dtFim').value;if(!dt){toast('Informe a data de conclusão','error');return;}
-      if(concluirDataIni&&dt<String(concluirDataIni).split('T')[0]){toast('A conclusão não pode ser anterior ao início ('+fmtD(concluirDataIni)+')','error');return;}
-      const btn=document.getElementById('btnConcluir');btn.classList.add('bl');btn.disabled=true;
-      try{const {error}=await db.from('atividades').update({data_fim:dt}).eq('id',concluirId);if(error)throw error;toast('Frente concluída!','success');fecharModal();loadAndamento();}
-      catch(e){toast('Erro ao concluir: '+(e.message||e),'error');console.error(e);}
-      finally{btn.classList.remove('bl');btn.disabled=false;}
-    }
-
-    // ===== CONCLUÍDAS =====
-    async function loadConcluidas(){
-      document.getElementById('concLoad').classList.remove('hidden');document.getElementById('concList').innerHTML='';document.getElementById('concEmpty').classList.add('hidden');
-      try{
-        const {data,error}=await db.from('atividades').select('*, producao(*)').eq('status','concluida').order('data_fim',{ascending:false}).limit(50);
-        if(error)throw error;const list=document.getElementById('concList');
-        if(!data||!data.length){document.getElementById('concEmpty').classList.remove('hidden');}
-        else{(data||[]).forEach((a,i)=>{const tit=(a.producao||[]).find(p=>p.titular)||((a.producao||[])[0]);const area=tit&&tit.tipo_remuneracao==='medido'?tit.area_m2:0;
-          const card=document.createElement('div');card.className='bg-white rounded-lg shadow-md1 p-4 su';card.style.animationDelay=(i*.02)+'s';
-          card.innerHTML='<div class="flex items-start justify-between gap-3"><div class="min-w-0 flex-1"><p class="text-sm font-bold text-g-text">'+esc(a.servico)+'</p><p class="text-xs text-g-secondary mt-0.5">'+esc(a.obra)+' · '+esc(a.pavimento)+' · '+esc(a.ambiente)+'</p><p class="text-xs text-g-hint mt-1">'+fmtD(a.data_inicio)+' → '+fmtD(a.data_fim)+(area?' · '+fmtM2(area):'')+'</p></div><span class="text-xs font-medium px-2 py-1 rounded-full bg-g-greenBg text-g-green flex-shrink-0">✓ Concluída</span></div>';
-          list.appendChild(card);});}
-      }catch(e){console.error(e);document.getElementById('concEmpty').classList.remove('hidden');}
-      document.getElementById('concLoad').classList.add('hidden');
-    }
-
-    // ===== MEDIÇÃO =====
-    async function loadMedicao(){
-      document.getElementById('medLoad').classList.remove('hidden');document.getElementById('medList').innerHTML='';document.getElementById('medEmpty').classList.add('hidden');document.getElementById('medTotal').classList.add('hidden');
-      try{const {data,error}=await db.from('vw_medicao').select('*');if(error)throw error;medData=data||[];
-        const obras=[...new Set(medData.map(m=>m.obra))].sort();const ciclos=[...new Set(medData.map(m=>m.ciclo))].sort().reverse();
-        const os=document.getElementById('medObra'),cs=document.getElementById('medCiclo');
-        os.innerHTML='<option value="">Todas obras</option>';obras.forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;os.appendChild(op);});
-        cs.innerHTML='<option value="">Todos ciclos</option>';ciclos.forEach(c=>{const op=document.createElement('option');op.value=c;op.textContent=c;cs.appendChild(op);});
-      }catch(e){console.error(e);medData=[];}
-      document.getElementById('medLoad').classList.add('hidden');renderMedicao();
-    }
-    function limparPeriodo(){document.getElementById('medDe').value='';document.getElementById('medAte').value='';renderMedicao();}
-    function renderMedicao(){
-      const list=document.getElementById('medList');list.innerHTML='';
-      const fo=document.getElementById('medObra').value,fc=document.getElementById('medCiclo').value;
-      const de=document.getElementById('medDe').value,ate=document.getElementById('medAte').value;
-      let d=medData;
-      if(fo)d=d.filter(m=>m.obra===fo);
-      if(fc)d=d.filter(m=>m.ciclo===fc);
-      // Filtro por período de conclusão (data_fim)
-      if(de)d=d.filter(m=>m.data_fim&&String(m.data_fim).split('T')[0]>=de);
-      if(ate)d=d.filter(m=>m.data_fim&&String(m.data_fim).split('T')[0]<=ate);
-      if(!d.length){document.getElementById('medEmpty').classList.remove('hidden');document.getElementById('medTotal').classList.add('hidden');return;}
-      document.getElementById('medEmpty').classList.add('hidden');
-      // Re-agregar por obra+serviço (a view vem por data_fim, somamos no período filtrado)
-      const agg={};
-      d.forEach(m=>{const k=m.obra+'||'+m.servico;if(!agg[k])agg[k]={obra:m.obra,servico:m.servico,m2:0,frentes:0,ciclos:new Set()};agg[k].m2+=Number(m.m2_executado||0);agg[k].frentes+=Number(m.qtd_frentes||0);if(m.ciclo)agg[k].ciclos.add(m.ciclo);});
-      const aggList=Object.values(agg).sort((a,b)=>b.m2-a.m2);
-      const totM2=aggList.reduce((s,m)=>s+m.m2,0);
-      const totFr=aggList.reduce((s,m)=>s+m.frentes,0);
-      document.getElementById('medTotal').classList.remove('hidden');
-      document.getElementById('medTotalM2').textContent=fmtM2(totM2);
-      const periodoTxt=(de||ate)?' · período '+(de?fmtD(de):'…')+' a '+(ate?fmtD(ate):'…'):'';
-      document.getElementById('medTotalFrentes').textContent=totFr+' frente(s)'+periodoTxt;
-      aggList.forEach((m,i)=>{
-        const ciclosTxt=[...m.ciclos].sort().join(', ');
-        const card=document.createElement('div');card.className='bg-white rounded-lg shadow-md1 p-4 su';card.style.animationDelay=(i*.02)+'s';
-        card.innerHTML='<div class="flex items-start justify-between gap-3"><div class="min-w-0 flex-1"><p class="text-sm font-bold text-g-text">'+esc(m.obra)+'</p><p class="text-xs text-g-secondary mt-0.5">'+esc(m.servico)+'</p><p class="text-xs text-g-hint mt-1">Ciclo(s) '+esc(ciclosTxt)+' · '+m.frentes+' frente(s)</p></div><div class="text-right flex-shrink-0"><p class="text-base font-bold text-g-blue">'+fmtM2(m.m2)+'</p><p class="text-xs text-g-hint">a medir</p></div></div>';
-        list.appendChild(card);
-      });
-    }
-
-    // ===== PRODUÇÃO =====
-    async function loadProducao(){
-      document.getElementById('prodLoad').classList.remove('hidden');document.getElementById('prodList').innerHTML='';document.getElementById('prodEmpty').classList.add('hidden');document.getElementById('prodTotal').classList.add('hidden');
-      try{const {data,error}=await db.from('vw_producao_mo').select('*');if(error)throw error;prodData=data||[];
-        const meses=[...new Set(prodData.map(p=>p.mes))].sort().reverse();const profs=[...new Set(prodData.map(p=>p.profissional))].sort();
-        const ms=document.getElementById('prodMes'),ps=document.getElementById('prodProf');
-        ms.innerHTML='<option value="">Todos meses</option>';meses.forEach(m=>{const op=document.createElement('option');op.value=m;op.textContent=m;ms.appendChild(op);});
-        ps.innerHTML='<option value="">Todos profissionais</option>';profs.forEach(p=>{const op=document.createElement('option');op.value=p;op.textContent=p;ps.appendChild(op);});
-      }catch(e){console.error(e);prodData=[];}
-      document.getElementById('prodLoad').classList.add('hidden');renderProducao();
-    }
-    function renderProducao(){
-      const list=document.getElementById('prodList');list.innerHTML='';
-      const fm=document.getElementById('prodMes').value,fp=document.getElementById('prodProf').value;
-      let d=prodData;if(fm)d=d.filter(p=>p.mes===fm);if(fp)d=d.filter(p=>p.profissional===fp);
-      if(!d.length){document.getElementById('prodEmpty').classList.remove('hidden');return;}
-      document.getElementById('prodEmpty').classList.add('hidden');
-      const tot=d.reduce((s,p)=>s+Number(p.valor_mo||0),0);
-      document.getElementById('prodTotal').classList.remove('hidden');document.getElementById('prodTotalVal').textContent=fmtBR(tot);
-      const byProf={};
-      d.forEach(p=>{if(!byProf[p.profissional])byProf[p.profissional]={total:0,m2:0,items:[]};byProf[p.profissional].total+=Number(p.valor_mo||0);byProf[p.profissional].m2+=Number(p.m2_produzido||0);byProf[p.profissional].items.push(p);});
-      Object.entries(byProf).sort((a,b)=>b[1].total-a[1].total).forEach(([prof,info],i)=>{
-        const card=document.createElement('div');card.className='bg-white rounded-lg shadow-md1 p-4 su';card.style.animationDelay=(i*.02)+'s';
-        const tlabel={medido:'',diaria:' (diária)',tarefa:' (tarefa)',reparo:' (reparo)'};
-        let itemsHtml=info.items.map(it=>{
-          const unit=(it.tipo_remuneracao==='medido'&&it.preco_unit)?' × '+fmtBR(it.preco_unit)+'/m²':'';
-          return '<div class="flex justify-between text-xs text-g-secondary py-1 border-t border-g-divider"><span>'+esc(it.obra)+' · '+esc(it.servico)+' ('+esc(it.funcao)+')'+(tlabel[it.tipo_remuneracao]||'')+'</span><span class="font-medium">'+(it.tipo_remuneracao==='medido'?fmtM2(it.m2_produzido)+unit+' · ':'')+fmtBR(it.valor_mo)+'</span></div>';
-        }).join('');
-        card.innerHTML='<div class="flex items-start justify-between gap-3 mb-2"><div><p class="text-sm font-bold text-g-text">'+esc(prof)+'</p>'+(info.m2>0?'<p class="text-xs text-g-hint">'+fmtM2(info.m2)+' no período</p>':'')+'</div><p class="text-base font-bold text-g-green flex-shrink-0">'+fmtBR(info.total)+'</p></div>'+itemsHtml;
-        list.appendChild(card);
-      });
-    }
-
-    // ===== KPIs =====
-    function loadKpis(){
-      // Reuse prodData if loaded, else fetch
-      if(prodData.length===0){
-        document.getElementById('kpiLoad').classList.remove('hidden');
-        document.getElementById('kpiContent').classList.add('hidden');
-        db.from('vw_producao_mo').select('*').then(({data,error})=>{
-          if(!error)prodData=data||[];
-          setupKpiMes();renderKpis();
-        });
-      }else{setupKpiMes();renderKpis();}
-    }
-    function setupKpiMes(){
-      const meses=[...new Set(prodData.map(p=>p.mes))].sort().reverse();
-      const ms=document.getElementById('kpiMes');
-      const cur=ms.value;
-      ms.innerHTML='<option value="">Todos os meses</option>';
-      meses.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;ms.appendChild(o);});
-      if(cur)ms.value=cur;
-    }
-    function rankCard(nome,valor,sub,i,cor){
-      const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'º';
-      return '<div class="bg-white rounded-lg shadow-md1 p-3 flex items-center justify-between su" style="animation-delay:'+(i*.03)+'s"><div class="flex items-center gap-3 min-w-0"><span class="text-base font-bold w-8 text-center flex-shrink-0">'+medal+'</span><div class="min-w-0"><p class="text-sm font-bold text-g-text truncate">'+esc(nome)+'</p>'+(sub?'<p class="text-xs text-g-hint">'+sub+'</p>':'')+'</div></div><p class="text-sm font-bold flex-shrink-0 ml-2" style="color:'+cor+'">'+valor+'</p></div>';
-    }
-    function renderKpis(){
-      const fm=document.getElementById('kpiMes').value;
-      let d=prodData;if(fm)d=d.filter(p=>p.mes===fm);
-      // Only 'medido' entries count for m² rankings
-      const dm=d.filter(p=>p.tipo_remuneracao==='medido');
-      document.getElementById('kpiLoad').classList.add('hidden');
-      if(!d.length){document.getElementById('kpiEmpty').classList.remove('hidden');document.getElementById('kpiContent').classList.add('hidden');return;}
-      document.getElementById('kpiEmpty').classList.add('hidden');document.getElementById('kpiContent').classList.remove('hidden');
-
-      // 1. Coordenadores (m²)
-      const coord={};dm.forEach(p=>{if(!p.coordenador)return;coord[p.coordenador]=(coord[p.coordenador]||0)+Number(p.m2_produzido||0);});
-      document.getElementById('kpiCoord').innerHTML=Object.entries(coord).sort((a,b)=>b[1]-a[1]).map(([n,v],i)=>rankCard(n,fmtM2(v),null,i,'#1a73e8')).join('')||'<p class="text-xs text-g-hint">Sem dados</p>';
-
-      // 2. Encarregados (m²)
-      const enc={};dm.forEach(p=>{if(!p.encarregado)return;enc[p.encarregado]=(enc[p.encarregado]||0)+Number(p.m2_produzido||0);});
-      document.getElementById('kpiEnc').innerHTML=Object.entries(enc).sort((a,b)=>b[1]-a[1]).map(([n,v],i)=>rankCard(n,fmtM2(v),null,i,'#137333')).join('')||'<p class="text-xs text-g-hint">Sem dados</p>';
-
-      // 3. Colaboradores (m²)
-      const colab={};dm.forEach(p=>{colab[p.profissional]=(colab[p.profissional]||0)+Number(p.m2_produzido||0);});
-      document.getElementById('kpiColab').innerHTML=Object.entries(colab).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([n,v],i)=>rankCard(n,fmtM2(v),null,i,'#137333')).join('')||'<p class="text-xs text-g-hint">Sem dados</p>';
-
-      // 4. Produção por serviço (m² total + média por frente)
-      const serv={};dm.forEach(p=>{if(!serv[p.servico])serv[p.servico]={m2:0,n:0};serv[p.servico].m2+=Number(p.m2_produzido||0);serv[p.servico].n++;});
-      document.getElementById('kpiServ').innerHTML=Object.entries(serv).sort((a,b)=>b[1].m2-a[1].m2).map(([n,info],i)=>rankCard(n,fmtM2(info.m2),'média '+fmtM2(info.m2/info.n)+'/lançamento',i,'#1a73e8')).join('')||'<p class="text-xs text-g-hint">Sem dados</p>';
-
-      // 5. Obras por serviço (m²) - top combos
-      const obra={};dm.forEach(p=>{const k=p.obra+' · '+p.servico;obra[k]=(obra[k]||0)+Number(p.m2_produzido||0);});
-      document.getElementById('kpiObra').innerHTML=Object.entries(obra).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([n,v],i)=>rankCard(n,fmtM2(v),null,i,'#b06000')).join('')||'<p class="text-xs text-g-hint">Sem dados</p>';
-    }
-  </script>
+    document.getElementById('detailContent').innerHTML=h;
+    show('vDetail');
+  }catch(e){toast('Erro ao abrir detalhe: '+(e.message||e),'error');console.error(e);}
+}
+</script>
 </body>
 </html>
