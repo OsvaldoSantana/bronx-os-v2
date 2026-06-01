@@ -603,7 +603,10 @@
       Object.entries(byProf).sort((a,b)=>b[1].total-a[1].total).forEach(([prof,info],i)=>{
         const card=document.createElement('div');card.className='bg-white rounded-lg shadow-md1 p-4 su';card.style.animationDelay=(i*.02)+'s';
         const tlabel={medido:'',diaria:' (diária)',tarefa:' (tarefa)',reparo:' (reparo)'};
-        let itemsHtml=info.items.map(it=>'<div class="flex justify-between text-xs text-g-secondary py-1 border-t border-g-divider"><span>'+esc(it.obra)+' · '+esc(it.servico)+' ('+esc(it.funcao)+')'+(tlabel[it.tipo_remuneracao]||'')+'</span><span class="font-medium">'+(it.tipo_remuneracao==='medido'?fmtM2(it.m2_produzido)+' · ':'')+fmtBR(it.valor_mo)+'</span></div>').join('');
+        let itemsHtml=info.items.map(it=>{
+          const unit=(it.tipo_remuneracao==='medido'&&it.preco_unit)?' × '+fmtBR(it.preco_unit)+'/m²':'';
+          return '<div class="flex justify-between text-xs text-g-secondary py-1 border-t border-g-divider"><span>'+esc(it.obra)+' · '+esc(it.servico)+' ('+esc(it.funcao)+')'+(tlabel[it.tipo_remuneracao]||'')+'</span><span class="font-medium">'+(it.tipo_remuneracao==='medido'?fmtM2(it.m2_produzido)+unit+' · ':'')+fmtBR(it.valor_mo)+'</span></div>';
+        }).join('');
         card.innerHTML='<div class="flex items-start justify-between gap-3 mb-2"><div><p class="text-sm font-bold text-g-text">'+esc(prof)+'</p>'+(info.m2>0?'<p class="text-xs text-g-hint">'+fmtM2(info.m2)+' no período</p>':'')+'</div><p class="text-base font-bold text-g-green flex-shrink-0">'+fmtBR(info.total)+'</p></div>'+itemsHtml;
         list.appendChild(card);
       });
