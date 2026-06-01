@@ -81,7 +81,9 @@
 
     <div class="bg-white rounded-lg shadow-md1 p-5 space-y-4 su">
       <p class="sl mb-2">Frente de Trabalho</p>
-      <div class="fg" id="fgO"><label class="fl">Obra <span class="text-g-red">*</span></label><select id="obra" class="f"><option value="">Selecione a obra</option></select></div>
+      <div class="fg" id="fgO"><label class="fl">Obra <span class="text-g-red">*</span></label><select id="obra" class="f"><option value="">Selecione a obra</option></select>
+        <p id="encBadge" class="text-xs text-g-secondary mt-1.5 bg-g-bg rounded-md px-2 py-1.5 hidden"></p>
+      </div>
       <div class="fg disabled" id="fgP"><label class="fl">Pavimento <span class="text-g-red">*</span></label><select id="pav" class="f"><option value="">Selecione o pavimento</option></select></div>
       <div><label class="fl">Ambiente <span class="text-g-red">*</span></label><input type="text" id="amb" placeholder="Ex: Banheiros, Laje, Jardins" class="f"></div>
       <div class="fg" id="fgS"><label class="fl">Serviço <span class="text-g-red">*</span></label><select id="svc" class="f"><option value="">Selecione o serviço</option></select><p id="svcHint" class="text-xs text-g-hint mt-1 hidden"></p></div>
@@ -259,6 +261,11 @@
     document.getElementById('obra').addEventListener('change',function(){
       const sp=document.getElementById('pav');sp.innerHTML='<option value="">Selecione o pavimento</option>';
       document.getElementById('svc').innerHTML='<option value="">Selecione o serviço</option>';
+      // Mostra encarregado da obra (implícito)
+      const encBadge=document.getElementById('encBadge');
+      const enc=(REF.encarregados&&REF.encarregados[this.value])||null;
+      if(enc){encBadge.innerHTML='👷 Encarregado: <b>'+esc(enc[0])+'</b> · Coord.: <b>'+esc(enc[1])+'</b>';encBadge.classList.remove('hidden');}
+      else{encBadge.classList.add('hidden');}
       if(!this.value){document.getElementById('fgP').classList.add('disabled');return;}
       document.getElementById('fgP').classList.remove('disabled');
       (REF.pavimentos[this.value]||[]).forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;sp.appendChild(o);});
@@ -380,10 +387,13 @@
       const btn=document.getElementById('btnSalvar');salvando=true;btn.classList.add('bl');btn.disabled=true;
       try{
         const svcVal=needSvc?document.getElementById('svc').value:({diaria:'Diária (Sábado/Domingo/Feriado)'}[tipoAtual]||tipoAtual);
+        const obraSel=document.getElementById('obra').value;
+        const encInfo=(REF.encarregados&&REF.encarregados[obraSel])||null;
         const {data:atv,error:e1}=await db.from('atividades').insert({
-          obra:document.getElementById('obra').value,pavimento:document.getElementById('pav').value,
+          obra:obraSel,pavimento:document.getElementById('pav').value,
           ambiente:document.getElementById('amb').value.trim(),servico:svcVal,
           data_inicio:document.getElementById('dtIni').value,observacoes:document.getElementById('obs').value.trim(),
+          encarregado:encInfo?encInfo[0]:null,coordenador:encInfo?encInfo[1]:null,
           criado_por:document.getElementById('resp').value.trim()
         }).select().single();
         if(e1)throw e1;
